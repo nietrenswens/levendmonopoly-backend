@@ -9,6 +9,7 @@ namespace LevendMonopoly.Api.Data
         public DbSet<User> Users { get; set; } = null!;
         public DbSet<Role> Roles { get; set; } = null!;
         public DbSet<Log> Logs { get; set; } = null!;
+        public DbSet<Session> Sessions { get; set;} = null!;
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

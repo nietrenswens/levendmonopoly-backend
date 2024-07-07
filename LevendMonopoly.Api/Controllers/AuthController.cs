@@ -14,12 +14,15 @@ namespace LevendMonopoly.Api.Controllers
     public class AuthController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly LevendMonopoly.Api.Interfaces.ILogger _logger;
+        private readonly ISessionService _sessionService;
+        private readonly Interfaces.ILogger _logger;
 
-        public AuthController(IUserService userService, LevendMonopoly.Api.Interfaces.ILogger logger)
+
+        public AuthController(IUserService userService, Interfaces.ILogger logger, ISessionService sessionService)
         {
             _userService = userService;
             _logger = logger;
+            _sessionService = sessionService;
         }
         
         [HttpPost("register")]
@@ -57,11 +60,18 @@ namespace LevendMonopoly.Api.Controllers
                 });
                 return StatusCode(500);
             }
+
+            await _logger.LogAsync(new Log()
+            {
+                Message = $"User {user.Name} has registered.",
+                Suspicious = false,
+                Details = ""
+            });
             return Ok();
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult> Login(UserPostBody userbody)
+        public async Task<ActionResult<Session>> Login(UserPostBody userbody)
         {
             if (!UserValidation.IsValidUser(userbody))
             {
@@ -85,9 +95,9 @@ namespace LevendMonopoly.Api.Controllers
                 });
                 return NotFound();
             }
+
             var userbodySalt = Convert.FromBase64String(user.Salt);
             var passwordHash = Cryptography.HashPassword(userbody.Password, userbodySalt);
-
             if (!passwordHash.Equals(user.PasswordHash))
             {
                 await _logger.LogAsync(new Log()
@@ -98,7 +108,64 @@ namespace LevendMonopoly.Api.Controllers
                 });
                 return Unauthorized();
             }
-            // TODO: Create Session and send token
+
+            Session? session = await _sessionService.CreateSessionAsync(user);
+            if (session == null)
+            {
+                await _logger.LogAsync(new Log()
+                {
+                    Message = "Failed to create a session for a user while logging in.",
+                    Suspicious = false,
+                    Details = $"Email: {user.Email}."
+                });
+                return StatusCode(500);
+            }
+
+            await _logger.LogAsync(new Log()
+            {
+                Message = $"User {user.Name} has logged in.",
+                Suspicious = false,
+                Details = ""
+            });
+            return Ok(session);
+        }
+
+        [HttpGet("check")]
+        public async Task<ActionResult> CheckSession(string token)
+        {
+            if (token == null)
+            {
+                await _logger.LogAsync(new Log()
+                {
+                    Message = "No token was provided while checking a session.",
+                    Suspicious = true,
+                    Details = "No details."
+                });
+                return BadRequest();
+            }
+
+            Session? session = await _sessionService.GetSessionAsync(token);
+            if (session == null)
+            {
+                await _logger.LogAsync(new Log()
+                {
+                    Message = "Failed to find a session in the database while checking a session.",
+                    Suspicious = false,
+                    Details = $"Token: {token}."
+                });
+                return NotFound();
+            }
+
+            if (session.ExpirationDate < DateTime.Now)
+            {
+                return Unauthorized();
+            }
+
+            if (!session.IsActive)
+            {
+                return Unauthorized();
+            }
+
             return Ok();
         }
     }
