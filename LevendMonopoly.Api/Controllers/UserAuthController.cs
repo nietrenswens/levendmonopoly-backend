@@ -11,14 +11,14 @@ namespace LevendMonopoly.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class AuthController : ControllerBase
+    public class UserAuthController : ControllerBase
     {
         private readonly IUserService _userService;
-        private readonly ISessionService _sessionService;
+        private readonly IUserSessionService _sessionService;
         private readonly Interfaces.ILogger _logger;
 
 
-        public AuthController(IUserService userService, Interfaces.ILogger logger, ISessionService sessionService)
+        public UserAuthController(IUserService userService, Interfaces.ILogger logger, IUserSessionService sessionService)
         {
             _userService = userService;
             _logger = logger;
@@ -26,6 +26,7 @@ namespace LevendMonopoly.Api.Controllers
         }
         
         [HttpPost("register")]
+        // TODO: Block this method behind authentication
         public async Task<ActionResult> Register(UserPostBody userbody)
         {
             if (!UserValidation.IsValidUser(userbody))

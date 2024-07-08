@@ -8,7 +8,7 @@ namespace LevendMonopoly.Api.Filters
         public async Task OnActionExecutionAsync(ActionExecutingContext actionContext, ActionExecutionDelegate next)
         {
             var context = actionContext.HttpContext;
-            var sessionService = (ISessionService) context.RequestServices.GetService(typeof(ISessionService))!;
+            var sessionService = (IUserSessionService) context.RequestServices.GetService(typeof(IUserSessionService))!;
             if (sessionService == null)
             {
                 context.Response.StatusCode = 500;

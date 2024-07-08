@@ -5,12 +5,12 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LevendMonopoly.Api.Services
 {
-    public class SessionService : ISessionService
+    public class UserSessionService : IUserSessionService
     {
         private readonly DataContext _context;
         private readonly IConfiguration _configuration;
 
-        public SessionService(DataContext context, IConfiguration configuration)
+        public UserSessionService(DataContext context, IConfiguration configuration)
         {
             _context = context;
             _configuration = configuration;
