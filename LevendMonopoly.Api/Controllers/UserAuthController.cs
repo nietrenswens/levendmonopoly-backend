@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace LevendMonopoly.Api.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class UserAuthController : ControllerBase
     {
         private readonly IUserService _userService;
