@@ -1,5 +1,5 @@
 using LevendMonopoly.Api.Data;
-using LevendMonopoly.Api.Interfaces;
+using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using Microsoft.EntityFrameworkCore;
 

@@ -1,6 +1,6 @@
 using LevendMonopoly.Api.Models;
 
-namespace LevendMonopoly.Api.Interfaces
+namespace LevendMonopoly.Api.Interfaces.Services
 {
     public interface IUserService
     {

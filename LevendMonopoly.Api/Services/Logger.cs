@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace LevendMonopoly.Api.Services
 {
-    public class Logger : ILogger
+    public class Logger : Interfaces.Services.ILogger
     {
         private readonly DataContext _context;
 

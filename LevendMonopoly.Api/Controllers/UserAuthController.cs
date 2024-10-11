@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
-using LevendMonopoly.Api.InputValidation;
-using LevendMonopoly.Api.Interfaces;
+using LevendMonopoly.Api.DTOs;
+using LevendMonopoly.Api.Filters;
+using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using LevendMonopoly.Api.Records;
 using LevendMonopoly.Api.Utils;
@@ -15,34 +16,23 @@ namespace LevendMonopoly.Api.Controllers
     {
         private readonly IUserService _userService;
         private readonly IUserSessionService _sessionService;
-        private readonly Interfaces.ILogger _logger;
+        private readonly Interfaces.Services.ILogger _logger;
 
 
-        public UserAuthController(IUserService userService, Interfaces.ILogger logger, IUserSessionService sessionService)
+        public UserAuthController(IUserService userService, Interfaces.Services.ILogger logger, IUserSessionService sessionService)
         {
             _userService = userService;
             _logger = logger;
             _sessionService = sessionService;
         }
-        
+
         [HttpPost("register")]
-        // TODO: Block this method behind authentication
+        [AuthFilter]
         public async Task<ActionResult> Register(UserPostBody userbody)
         {
-            if (!UserValidation.IsValidUser(userbody))
-            {
-                await _logger.LogAsync(new Log()
-                {
-                    Message = "Server-side user input validation failed while registering a new user.",
-                    Suspicious = true,
-                    Details = $"Name: {userbody.Name}, Email: {userbody.Email}."
-                });
-                return BadRequest();
-            }
-
             // Generate password hash and salt
             byte[] passwordSalt = Cryptography.GenerateSalt();
-            string passwordHash = Cryptography.HashPassword(userbody.Password, passwordSalt);            
+            string passwordHash = Cryptography.HashPassword(userbody.Password, passwordSalt);
 
             User user = new User()
             {
@@ -72,43 +62,39 @@ namespace LevendMonopoly.Api.Controllers
         }
 
         [HttpPost("login")]
-        public async Task<ActionResult<Session>> Login(UserPostBody userbody)
+        public async Task<ActionResult<SessionDTO>> Login(UserLoginCommand command)
         {
-            if (!UserValidation.IsValidUser(userbody))
-            {
-                await _logger.LogAsync(new Log()
-                {
-                    Message = "Server-side user input validation failed while logging in a user.",
-                    Suspicious = true,
-                    Details = $"Name: {userbody.Name}, Email: {userbody.Email}."
-                });
-                return BadRequest();
-            }
-
-            User? user = _userService.GetUser(user => user.Email == userbody.Email);
+            User? user = _userService.GetUser(user => user.Email == command.Email);
             if (user == null)
             {
                 await _logger.LogAsync(new Log()
                 {
                     Message = "Failed to find a user in the database while logging in.",
                     Suspicious = false,
-                    Details = $"Email: {userbody.Email}."
+                    Details = $"Email: {command.Email}."
                 });
                 return NotFound();
             }
 
             var userbodySalt = Convert.FromBase64String(user.Salt);
-            var passwordHash = Cryptography.HashPassword(userbody.Password, userbodySalt);
+            var passwordHash = Cryptography.HashPassword(command.Password, userbodySalt);
             if (!passwordHash.Equals(user.PasswordHash))
             {
                 await _logger.LogAsync(new Log()
                 {
                     Message = "Failed to verify the password of a user while logging in.",
                     Suspicious = false,
-                    Details = $"Email: {userbody.Email}."
+                    Details = $"Email: {command.Email}."
                 });
                 return Unauthorized();
             }
+
+            var oldSessions = await _sessionService.GetSessionsAsync(user.Id);
+            foreach (var oldSession in oldSessions)
+            {
+                oldSession.IsActive = false;
+            }
+            await _sessionService.UpdateSessionsAsync(oldSessions);
 
             Session? session = await _sessionService.CreateSessionAsync(user);
             if (session == null)
@@ -128,36 +114,25 @@ namespace LevendMonopoly.Api.Controllers
                 Suspicious = false,
                 Details = ""
             });
-            return Ok(session);
+            return Ok(new SessionDTO(session));
         }
 
-        [HttpGet("check")]
-        public async Task<ActionResult> CheckSession(string token)
+        [HttpPost("check")]
+        public async Task<ActionResult> CheckSession(TokenCommand command)
         {
-            if (token == null)
-            {
-                await _logger.LogAsync(new Log()
-                {
-                    Message = "No token was provided while checking a session.",
-                    Suspicious = true,
-                    Details = "No details."
-                });
-                return BadRequest();
-            }
-
-            Session? session = await _sessionService.GetSessionAsync(token);
+            Session? session = await _sessionService.GetSessionAsync(command.Token);
             if (session == null)
             {
                 await _logger.LogAsync(new Log()
                 {
                     Message = "Failed to find a session in the database while checking a session.",
                     Suspicious = false,
-                    Details = $"Token: {token}."
+                    Details = $"Token: {command.Token}."
                 });
                 return NotFound();
             }
 
-            if (session.ExpirationDate < DateTime.Now)
+            if (session.ExpirationDate.ToUniversalTime() < DateTime.Now.ToUniversalTime())
             {
                 return Unauthorized();
             }
@@ -167,7 +142,18 @@ namespace LevendMonopoly.Api.Controllers
                 return Unauthorized();
             }
 
-            return Ok();
+            return NoContent();
         }
+    }
+
+    public record UserLoginCommand()
+    {
+        public required string Email { get; init; }
+        public required string Password { get; init; }
+    }
+
+    public record TokenCommand
+    {
+        public required string Token { get; init; }
     }
 }

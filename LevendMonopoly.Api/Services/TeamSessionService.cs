@@ -1,5 +1,5 @@
 ﻿using LevendMonopoly.Api.Data;
-using LevendMonopoly.Api.Interfaces;
+using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +22,7 @@ namespace LevendMonopoly.Api.Services
                 Team = team,
                 TeamId = team.Id,
                 Token = Guid.NewGuid().ToString(),
+                ExpiryDate = DateTime.Now.AddDays(2),
             };
             await _context.TeamSessions.AddAsync(session);
             return await _context.SaveChangesAsync() > 0 ? session : null;

@@ -1,5 +1,5 @@
 using LevendMonopoly.Api.Data;
-using LevendMonopoly.Api.Interfaces;
+using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -28,7 +28,7 @@ namespace LevendMonopoly.Api.Services
                 UserId = user.Id,
                 Token = Guid.NewGuid().ToString(),
                 IsActive = true,
-                ExpirationDate = DateTime.Now.AddMinutes(sessionduration)
+                ExpirationDate = DateTime.Now.AddDays(2).ToUniversalTime()
             };
             await _context.Sessions.AddAsync(session);
             return await _context.SaveChangesAsync() > 0 ? session : null;
@@ -45,9 +45,26 @@ namespace LevendMonopoly.Api.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<Session?> GetSessionAsync(string token)
+
+        Task<Session?> GetSessionAsync(string token)
+        {
+            throw new NotImplementedException();
+        }
+
+        async Task<Session?> IUserSessionService.GetSessionAsync(string token)
         {
             return await _context.Sessions.FirstOrDefaultAsync(s => s.Token == token);
+        }
+
+        public async Task<IEnumerable<Session>> GetSessionsAsync(Guid userId)
+        {
+            return await _context.Sessions.Where(s => s.UserId == userId).ToListAsync();
+        }
+
+        public async Task UpdateSessionsAsync(IEnumerable<Session> sessions)
+        {
+            _context.UpdateRange(sessions);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -1,4 +1,5 @@
 using LevendMonopoly.Api.Models;
+using LevendMonopoly.Api.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace LevendMonopoly.Api.Data
@@ -17,6 +18,34 @@ namespace LevendMonopoly.Api.Data
         {
             
         }
-        
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            Guid adminRoleGuid = Guid.NewGuid();
+            modelBuilder.Entity<Role>().HasData(new Role()
+            {
+                Id = adminRoleGuid,
+                Name = "Admin"
+            });
+
+            modelBuilder.Entity<Role>().HasData(new Role()
+            {
+                Id = Guid.NewGuid(),
+                Name = "Moderator"
+            });
+
+            byte[] passwordSalt = Cryptography.GenerateSalt();
+            string passwordHash = Cryptography.HashPassword("admin", passwordSalt);
+            modelBuilder.Entity<User>().HasData(new User()
+            {
+                Email = "mulderrens@outlook.com",
+                Name = "Admin",
+                Id = Guid.NewGuid(),
+                Salt = Convert.ToBase64String(passwordSalt),
+                PasswordHash = passwordHash,
+                RoleId = adminRoleGuid,
+            });
+        }
+
     }
 }
