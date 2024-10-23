@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LevendMonopoly.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20241011082532_init")]
+    [Migration("20241022085832_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -90,12 +90,12 @@ namespace LevendMonopoly.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("8e4a8a11-5f7e-4926-89d2-dce2bb15512e"),
+                            Id = new Guid("482faab5-c9de-4060-ba5c-3b9b4696515a"),
                             Name = "Admin"
                         },
                         new
                         {
-                            Id = new Guid("48b8c497-4685-4ce2-a141-5d642e71ca93"),
+                            Id = new Guid("9005f9ab-6b62-4784-bc18-ba69d412ec21"),
                             Name = "Moderator"
                         });
                 });
@@ -150,6 +150,16 @@ namespace LevendMonopoly.Api.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Teams");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("4f491f90-1361-4305-b7a9-ec789e378e74"),
+                            Balance = 5000,
+                            Name = "RensTest",
+                            PasswordHash = "VrSJjr+9B7sdolHuZLWnMVED0bXm9R3miR5navS8Bns=",
+                            PasswordSalt = "M2Mk59lVllyVfi1BDlmlXw=="
+                        });
                 });
 
             modelBuilder.Entity("LevendMonopoly.Api.Models.TeamSession", b =>
@@ -196,12 +206,12 @@ namespace LevendMonopoly.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<Guid>("RoleId")
-                        .HasColumnType("uuid");
-
-                    b.Property<string>("Salt")
+                    b.Property<string>("PasswordSalt")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
@@ -212,12 +222,12 @@ namespace LevendMonopoly.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("dd60d427-d4c3-4439-87eb-84c9f213b0bc"),
+                            Id = new Guid("c35f98c2-021d-4a5d-8a39-65d253b39fbf"),
                             Email = "mulderrens@outlook.com",
                             Name = "Admin",
-                            PasswordHash = "gZIZMOVOojiCjHrJGl1auZ2vhAiPXq6UceV3HVt3ALc=",
-                            RoleId = new Guid("8e4a8a11-5f7e-4926-89d2-dce2bb15512e"),
-                            Salt = "weW1jMwkxWbj3tDbc0UFTg=="
+                            PasswordHash = "m+NRVSbvOp8h9iVnRMVarES2pGMW2GIr1K36XrFL/sQ=",
+                            PasswordSalt = "FHF9KS9/BhD5xiFHKh2kUQ==",
+                            RoleId = new Guid("482faab5-c9de-4060-ba5c-3b9b4696515a")
                         });
                 });
 

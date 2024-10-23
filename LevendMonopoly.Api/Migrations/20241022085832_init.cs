@@ -63,7 +63,7 @@ namespace LevendMonopoly.Api.Migrations
                     Name = table.Column<string>(type: "text", nullable: false),
                     Email = table.Column<string>(type: "text", nullable: false),
                     PasswordHash = table.Column<string>(type: "text", nullable: false),
-                    Salt = table.Column<string>(type: "text", nullable: false),
+                    PasswordSalt = table.Column<string>(type: "text", nullable: false),
                     RoleId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -143,14 +143,19 @@ namespace LevendMonopoly.Api.Migrations
                 columns: new[] { "Id", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("48b8c497-4685-4ce2-a141-5d642e71ca93"), "Moderator" },
-                    { new Guid("8e4a8a11-5f7e-4926-89d2-dce2bb15512e"), "Admin" }
+                    { new Guid("482faab5-c9de-4060-ba5c-3b9b4696515a"), "Admin" },
+                    { new Guid("9005f9ab-6b62-4784-bc18-ba69d412ec21"), "Moderator" }
                 });
 
             migrationBuilder.InsertData(
+                table: "Teams",
+                columns: new[] { "Id", "Balance", "Name", "PasswordHash", "PasswordSalt" },
+                values: new object[] { new Guid("4f491f90-1361-4305-b7a9-ec789e378e74"), 5000, "RensTest", "VrSJjr+9B7sdolHuZLWnMVED0bXm9R3miR5navS8Bns=", "M2Mk59lVllyVfi1BDlmlXw==" });
+
+            migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "Id", "Email", "Name", "PasswordHash", "RoleId", "Salt" },
-                values: new object[] { new Guid("dd60d427-d4c3-4439-87eb-84c9f213b0bc"), "mulderrens@outlook.com", "Admin", "gZIZMOVOojiCjHrJGl1auZ2vhAiPXq6UceV3HVt3ALc=", new Guid("8e4a8a11-5f7e-4926-89d2-dce2bb15512e"), "weW1jMwkxWbj3tDbc0UFTg==" });
+                columns: new[] { "Id", "Email", "Name", "PasswordHash", "PasswordSalt", "RoleId" },
+                values: new object[] { new Guid("c35f98c2-021d-4a5d-8a39-65d253b39fbf"), "mulderrens@outlook.com", "Admin", "m+NRVSbvOp8h9iVnRMVarES2pGMW2GIr1K36XrFL/sQ=", "FHF9KS9/BhD5xiFHKh2kUQ==", new Guid("482faab5-c9de-4060-ba5c-3b9b4696515a") });
 
             migrationBuilder.CreateIndex(
                 name: "IX_Buildings_OwnerId",

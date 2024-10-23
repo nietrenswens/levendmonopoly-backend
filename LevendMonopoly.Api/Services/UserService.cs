@@ -39,7 +39,7 @@ namespace LevendMonopoly.Api.Services
 
         public User? GetUser(Func<User, bool> predicate)
         {
-            var user = _context.Users.Where(predicate).FirstOrDefault();
+            var user = _context.Users.Include(u => u.Role).Where(predicate).FirstOrDefault();
             return user;
         }
 

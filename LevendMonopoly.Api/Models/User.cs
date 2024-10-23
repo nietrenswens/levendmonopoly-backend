@@ -1,16 +1,17 @@
+using LevendMonopoly.Api.Interfaces;
+using LevendMonopoly.Api.Utils;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LevendMonopoly.Api.Models
 {
-    public class User
+    public class User : IIdentityEntity
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
         [ForeignKey("RoleId")]
         public Role Role { get; set; } = null!;
-        public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
-        public string Salt { get; set; } = null!;
+        public string PasswordSalt { get; set; } = null!;
 
         public Guid RoleId { get; set; }
 
@@ -20,7 +21,20 @@ namespace LevendMonopoly.Api.Models
 
         override public string ToString()
         {
-            return $"{Id} {Name} {Email} {Role.Name} {Role.Id} {RoleId}";
+            return $"{Id} {Name} {Role.Name} {Role.Id} {RoleId}";
+        }
+
+        public static User CreateNewUser(string name, string password, Guid roleId)
+        {
+            var salt = Cryptography.GenerateSalt();
+            return new User()
+            {
+                Id = Guid.NewGuid(),
+                Name = name,
+                PasswordHash = Cryptography.HashPassword(password, salt),
+                PasswordSalt = Convert.ToBase64String(salt),
+                RoleId = roleId
+            };
         }
     }
 }

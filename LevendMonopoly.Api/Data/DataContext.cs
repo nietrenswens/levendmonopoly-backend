@@ -36,15 +36,8 @@ namespace LevendMonopoly.Api.Data
 
             byte[] passwordSalt = Cryptography.GenerateSalt();
             string passwordHash = Cryptography.HashPassword("admin", passwordSalt);
-            modelBuilder.Entity<User>().HasData(new User()
-            {
-                Email = "mulderrens@outlook.com",
-                Name = "Admin",
-                Id = Guid.NewGuid(),
-                Salt = Convert.ToBase64String(passwordSalt),
-                PasswordHash = passwordHash,
-                RoleId = adminRoleGuid,
-            });
+            modelBuilder.Entity<Team>().HasData(Team.CreateNewTeam("RensTest", "wachtwoord"));
+            modelBuilder.Entity<User>().HasData(User.CreateNewUser("Rens", "wachtwoord", adminRoleGuid));
         }
 
     }

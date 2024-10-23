@@ -3,6 +3,7 @@ using System;
 using LevendMonopoly.Api.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LevendMonopoly.Api.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20241022135738_AddTax")]
+    partial class AddTax
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -90,12 +93,12 @@ namespace LevendMonopoly.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("51a9e58a-64d6-4ab2-84c0-5ef4384e352b"),
+                            Id = new Guid("64549f4f-6b22-44fd-907c-ebaab9124472"),
                             Name = "Admin"
                         },
                         new
                         {
-                            Id = new Guid("21e5698d-cb59-4ae8-af7a-f9eec0f55ad9"),
+                            Id = new Guid("63a88998-bfdd-4029-a9bf-42523686fda4"),
                             Name = "Moderator"
                         });
                 });
@@ -154,11 +157,11 @@ namespace LevendMonopoly.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("1c6ca39b-7383-4119-abf6-70a4beab2910"),
+                            Id = new Guid("002caa4d-1ea4-4136-a8cb-84269716e2f0"),
                             Balance = 5000,
                             Name = "RensTest",
-                            PasswordHash = "nrhLQYIC2RG3lM3cYYRgEThoMs+1/NR4BtKGqJdhpZw=",
-                            PasswordSalt = "450mnyQgdS8lCe/4LIq85w=="
+                            PasswordHash = "kPgOBsAkc/693Jemw6Xgkt4NFEWvtzBLlfTjtF6bGnM=",
+                            PasswordSalt = "ynvZxSg7GmF/yrrn20kVWw=="
                         });
                 });
 
@@ -194,6 +197,10 @@ namespace LevendMonopoly.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
@@ -218,11 +225,12 @@ namespace LevendMonopoly.Api.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("9fe52e10-3bcf-47d6-ba53-8d1d6302c465"),
-                            Name = "Rens",
-                            PasswordHash = "hTP6zJIRDxZltrwgXyH+Cu6b45DCMjfV61sRFX+iLfQ=",
-                            PasswordSalt = "VsDdYVNo6oP5B9H7whWmzg==",
-                            RoleId = new Guid("51a9e58a-64d6-4ab2-84c0-5ef4384e352b")
+                            Id = new Guid("ef371c31-ce79-4a70-8bb9-0e37fe822623"),
+                            Email = "mulderrens@outlook.com",
+                            Name = "Admin",
+                            PasswordHash = "I5PX3Ny7dukFsvmb+l9FjqD4Jap0JuPr5OMUu7C48y4=",
+                            PasswordSalt = "POvT5LE7vegG9BctMJsq4A==",
+                            RoleId = new Guid("64549f4f-6b22-44fd-907c-ebaab9124472")
                         });
                 });
 
