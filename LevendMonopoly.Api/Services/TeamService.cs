@@ -31,35 +31,27 @@ namespace LevendMonopoly.Api.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public async Task<List<Team>> GetAllTeamsAsync()
+        public async Task<List<Team>> GetAllTeamsAsync(bool includeBuildings = false)
         {
-            return await _context.Teams.ToListAsync();
+            return await _context.Teams.Include(t => t.Buildings).ToListAsync();
+
         }
 
         public async Task<Team?> GetTeamAsync(Guid teamId)
         {
-            return await _context.Teams.FirstOrDefaultAsync(team => team.Id == teamId);
+            return await _context.Teams.Include(t => t.Buildings).FirstOrDefaultAsync(team => team.Id == teamId);
         }
 
         public async Task<Team?> GetTeamByNameAsync(string name)
         {
-            return await _context.Teams.FirstOrDefaultAsync(team => team.Name.ToLower() == name.ToLower());
+            return await _context.Teams.Include(t => t.Buildings).FirstOrDefaultAsync(team => team.Name.ToLower() == name.ToLower());
         }
 
-        public async Task<bool> UpdateTeamAsync(Team team, Guid teamId)
+        public async Task UpdateTeamAsync(Team team)
         {
-            var teamToEdit = await GetTeamAsync(teamId);
-            if (teamToEdit == null) 
-            {
-                return false;
-            }
-            teamToEdit.Name = team.Name;
-            teamToEdit.PasswordHash = team.PasswordHash;
-            teamToEdit.PasswordSalt = team.PasswordSalt;
-            teamToEdit.Balance = team.Balance;
-            teamToEdit.Buildings = team.Buildings;
+            _context.Teams.Update(team);
 
-            return await _context.SaveChangesAsync() > 0;
+            await _context.SaveChangesAsync();
         }
     }
 }

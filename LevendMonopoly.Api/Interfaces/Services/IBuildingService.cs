@@ -6,6 +6,9 @@ namespace LevendMonopoly.Api.Interfaces.Services
     {
         Task<IEnumerable<Building>> GetBuildings(Guid userId);
         Task<IEnumerable<Building>> GetBuildings();
+        Task<Building?> GetBuilding(Guid buildingId);
         Task CreateBuilding(Building building);
+        Task DeleteBuilding(Guid id);
+        Task UpdateBuilding(Building building);
     }
 }

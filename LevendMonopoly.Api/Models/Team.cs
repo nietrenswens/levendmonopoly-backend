@@ -12,6 +12,23 @@ namespace LevendMonopoly.Api.Models
         public int Balance { get; set; }
         public List<Building> Buildings { get; set; } = null!;
 
+        public int Worth {
+            get
+            {
+                if (Buildings == null)
+                {
+                    return Balance;
+                }
+                int worth = 0;
+                foreach (var building in Buildings)
+                {
+                    worth += building.Price;
+                }
+                worth += Balance;
+                return worth;
+            }
+        }
+
         public static Team CreateNewTeam(string name, string password)
         {
             var salt = Cryptography.GenerateSalt();

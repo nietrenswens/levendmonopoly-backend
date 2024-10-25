@@ -30,5 +30,24 @@ namespace LevendMonopoly.Api.Services
             await _context.AddAsync(building);
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteBuilding(Guid id)
+        {
+            var building = await _context.Buildings.FirstOrDefaultAsync(b => b.Id == id);
+            if (building == null) return;
+            _context.Remove(building);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<Building?> GetBuilding(Guid buildingId)
+        {
+            return await _context.Buildings.FirstOrDefaultAsync(b => b.Id == buildingId);
+        }
+
+        public async Task UpdateBuilding(Building building)
+        {
+            _context.Update(building);
+            await _context.SaveChangesAsync();
+        }
     }
 }
