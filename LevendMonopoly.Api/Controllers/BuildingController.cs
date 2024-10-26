@@ -92,7 +92,7 @@ namespace LevendMonopoly.Api.Controllers
         private async Task<ActionResult<BuyResult>> buy(Building building, Team team, BuyCommand command)
         {
             building.OwnerId = team.Id;
-            building.Tax = true;
+            building.Tax = command.Tax;
             var cost = building.Price;
             if (command.Tax)
                 cost += (int)(building.Price * 0.6);
