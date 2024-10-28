@@ -14,24 +14,24 @@ namespace LevendMonopoly.Api.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Building>> GetBuildings(Guid userId)
+        public async Task<IEnumerable<Building>> GetBuildingsAsync(Guid userId)
         {
             var result = await _context.Buildings.Where(building => building.OwnerId == userId).ToListAsync();
             return await _context.Buildings.Where(building => building.OwnerId == userId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Building>> GetBuildings()
+        public async Task<IEnumerable<Building>> GetBuildingsAsync()
         {
             return await _context.Buildings.ToListAsync();
         }
 
-        public async Task CreateBuilding(Building building)
+        public async Task CreateBuildingAsync(Building building)
         {
             await _context.AddAsync(building);
             await _context.SaveChangesAsync();
         }
 
-        public async Task DeleteBuilding(Guid id)
+        public async Task DeleteBuildingAsync(Guid id)
         {
             var building = await _context.Buildings.FirstOrDefaultAsync(b => b.Id == id);
             if (building == null) return;
@@ -39,12 +39,12 @@ namespace LevendMonopoly.Api.Services
             await _context.SaveChangesAsync();
         }
 
-        public async Task<Building?> GetBuilding(Guid buildingId)
+        public async Task<Building?> GetBuildingAsync(Guid buildingId)
         {
             return await _context.Buildings.FirstOrDefaultAsync(b => b.Id == buildingId);
         }
 
-        public async Task UpdateBuilding(Building building)
+        public async Task UpdateBuildingAsync(Building building)
         {
             _context.Update(building);
             await _context.SaveChangesAsync();

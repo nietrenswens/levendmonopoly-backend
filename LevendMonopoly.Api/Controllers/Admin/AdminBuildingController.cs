@@ -20,28 +20,28 @@ namespace LevendMonopoly.Api.Controllers.Admin
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Building>>> GetBuildings()
         {
-            return Ok(await _buildingService.GetBuildings());
+            return Ok(await _buildingService.GetBuildingsAsync());
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<Building>> GetBuilding(Guid id)
         {
-            return Ok(await _buildingService.GetBuilding(id));
+            return Ok(await _buildingService.GetBuildingAsync(id));
         }
 
         [HttpPost]
         public async Task<ActionResult> PostBuilding(Building building)
         {
-            await _buildingService.CreateBuilding(building);
+            await _buildingService.CreateBuildingAsync(building);
             return Ok();
         }
 
         [HttpDelete]
         public async Task<ActionResult> DeleteBuilding(DeleteCommand command)
         {
-            if (!(await _buildingService.GetBuildings()).Any(b => b.Id == command.Id))
+            if (!(await _buildingService.GetBuildingsAsync()).Any(b => b.Id == command.Id))
                 return NotFound();
-            await _buildingService.DeleteBuilding(command.Id);
+            await _buildingService.DeleteBuildingAsync(command.Id);
             return Ok();
         }
 

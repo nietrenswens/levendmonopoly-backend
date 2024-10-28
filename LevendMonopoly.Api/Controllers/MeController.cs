@@ -30,7 +30,7 @@ namespace LevendMonopoly.Api.Controllers
             {
                 return NotFound();
             }
-            var buildings = (await _buildingService.GetBuildings(userId));
+            var buildings = (await _buildingService.GetBuildingsAsync(userId));
 
             int position = 1;
             for (int i = 0; i < teams.Count(); i++)

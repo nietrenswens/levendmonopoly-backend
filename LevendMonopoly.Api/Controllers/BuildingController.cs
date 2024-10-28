@@ -1,4 +1,5 @@
-﻿using LevendMonopoly.Api.Interfaces.Services;
+﻿using LevendMonopoly.Api.DTOs;
+using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,23 +22,42 @@ namespace LevendMonopoly.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IEnumerable<Building>> Get()
+        public async Task<IEnumerable<TeamBuilding>> Get()
         {
             // Get user id
             var userId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "id")!.Value);
-            return await _buildingService.GetBuildings(userId);
+            var buildings = await _buildingService.GetBuildingsAsync(userId);
+            var teamBuildings = new List<TeamBuilding>();
+            foreach (var building in buildings)
+            {
+                teamBuildings.Add(new TeamBuilding { 
+                    Id = building.Id, 
+                    Name = building.Name, 
+                    Price = building.Price, 
+                    Image = building.Image 
+                });
+            }
+            return teamBuildings;
         }
 
         [HttpGet("{buildingId}")]
-        public async Task<ActionResult<Building>> Get(string buildingId)
+        public async Task<ActionResult<TeamBuilding>> Get(string buildingId)
         {
             if(!Guid.TryParse(buildingId, out Guid id))
             {
                 return NotFound();
             }
-            var building = await _buildingService.GetBuilding(id);
+
+            var building = await _buildingService.GetBuildingAsync(id);
             if (building == null) return NotFound();
-            return Ok(building);
+
+            return Ok(new TeamBuilding
+            {
+                Id = building.Id,
+                Name = building.Name,
+                Price = building.Price,
+                Image = building.Image
+            });
         }
 
         [HttpPost("buy")]
@@ -46,7 +66,7 @@ namespace LevendMonopoly.Api.Controllers
             var teamId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "id")!.Value);
             var team = await _teamService.GetTeamAsync(teamId);
 
-            var building = await _buildingService.GetBuilding(command.BuildingId);
+            var building = await _buildingService.GetBuildingAsync(command.BuildingId);
             if (building == null) return NotFound();
             if (team == null) return NotFound();
 
@@ -98,7 +118,7 @@ namespace LevendMonopoly.Api.Controllers
                 cost += (int)(building.Price * 0.6);
             team.Balance -= cost;
 
-            await _buildingService.UpdateBuilding(building);
+            await _buildingService.UpdateBuildingAsync(building);
             await _teamService.UpdateTeamAsync(team);
 
             return Ok(new BuyResult()
