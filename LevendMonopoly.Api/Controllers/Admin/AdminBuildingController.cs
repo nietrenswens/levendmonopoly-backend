@@ -45,10 +45,34 @@ namespace LevendMonopoly.Api.Controllers.Admin
             return Ok();
         }
 
+        [HttpPut]
+        public async Task<ActionResult> PutBuilding(BuildingUpdateCommand command)
+        {
+            var existingBuilding = await _buildingService.GetBuildingAsync(command.Id);
+            if (existingBuilding == null)
+            {
+                return NotFound();
+            }
+
+            existingBuilding.Name = command.Name;
+            existingBuilding.Price = command.Price;
+            existingBuilding.Image = command.Image;
+
+            await _buildingService.UpdateBuildingAsync(existingBuilding);
+            return Ok();
+        }
     }
 
     public record DeleteCommand
     {
         public required Guid Id { get; init; }
+    }
+
+    public record BuildingUpdateCommand
+    {
+        public required Guid Id { get; init; }
+        public required string Name { get; init; }
+        public required int Price { get; init; }
+        public string? Image { get; init; }
     }
 }
