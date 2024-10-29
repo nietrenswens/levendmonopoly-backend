@@ -3,7 +3,6 @@ using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace LevendMonopoly.Api.Controllers
 {
@@ -14,10 +13,12 @@ namespace LevendMonopoly.Api.Controllers
     {
         private readonly IBuildingService _buildingService;
         private readonly ITeamService _teamService;
+        private readonly IGameSettingService _gameSettingService;
 
-        public BuildingController(IBuildingService buildingService, ITeamService teamService)
+        public BuildingController(IBuildingService buildingService, ITeamService teamService, IGameSettingService gameSettingService)
         {
             _buildingService = buildingService;
+            _gameSettingService = gameSettingService;
             _teamService = teamService;
         }
 
@@ -70,7 +71,7 @@ namespace LevendMonopoly.Api.Controllers
             if (building == null) return NotFound();
             if (team == null) return NotFound();
 
-            if (team.Balance < building.Price || (command.Tax && team.Balance < building.Price * 1.6))
+            if (team.Balance < building.Price || (command.Tax && team.Balance < building.Price * (1 + _gameSettingService.GetGameSettings().TaxRate)))
             {
 
                 return Ok(new BuyResult()
@@ -115,7 +116,7 @@ namespace LevendMonopoly.Api.Controllers
             building.Tax = command.Tax;
             var cost = building.Price;
             if (command.Tax)
-                cost += (int)(building.Price * 0.6);
+                cost += (int)(building.Price * (1 + _gameSettingService.GetGameSettings().TaxRate));
             team.Balance -= cost;
 
             await _buildingService.UpdateBuildingAsync(building);

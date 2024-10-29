@@ -55,6 +55,7 @@ builder.Services.AddTransient<LevendMonopoly.Api.Interfaces.Services.ILogger, Lo
 builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IBuildingService, BuildingService>();
+builder.Services.AddTransient<IGameSettingService, GameSettingsService>();
 
 var app = builder.Build();
 

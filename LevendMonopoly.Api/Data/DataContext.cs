@@ -12,6 +12,7 @@ namespace LevendMonopoly.Api.Data
         public DbSet<Role> Roles { get; set; } = null!;
         public DbSet<Log> Logs { get; set; } = null!;
         public DbSet<Session> Sessions { get; set;} = null!;
+        public DbSet<GameSettings> GameSettings { get; set; } = null!;
         public DbSet<TeamSession> TeamSessions { get; set; } = null!;
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
@@ -21,6 +22,12 @@ namespace LevendMonopoly.Api.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<GameSettings>().HasData(new GameSettings
+            {
+                Id = 1,
+                TaxRate = 0.6m
+            });
+
             Guid adminRoleGuid = Guid.NewGuid();
             modelBuilder.Entity<Role>().HasData(new Role()
             {
