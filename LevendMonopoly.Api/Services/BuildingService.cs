@@ -14,10 +14,10 @@ namespace LevendMonopoly.Api.Services
             _context = context;
         }
 
-        public async Task<IEnumerable<Building>> GetBuildingsAsync(Guid userId)
+        public async Task<IEnumerable<Building>> GetBuildingsAsync(Guid teamId)
         {
-            var result = await _context.Buildings.Where(building => building.OwnerId == userId).ToListAsync();
-            return await _context.Buildings.Where(building => building.OwnerId == userId).ToListAsync();
+            var result = await _context.Buildings.Where(building => building.OwnerId == teamId).ToListAsync();
+            return await _context.Buildings.Where(building => building.OwnerId == teamId).ToListAsync();
         }
 
         public async Task<IEnumerable<Building>> GetBuildingsAsync()
@@ -47,6 +47,15 @@ namespace LevendMonopoly.Api.Services
         public async Task UpdateBuildingAsync(Building building)
         {
             _context.Update(building);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task ResetBuildingsState(Guid teamId)
+        {
+            var buildings = _context.Buildings.Where(b => b.OwnerId == teamId);
+            await buildings.ForEachAsync(b => b.ResetToUnsoldState());
+
+            _context.UpdateRange(buildings);
             await _context.SaveChangesAsync();
         }
     }

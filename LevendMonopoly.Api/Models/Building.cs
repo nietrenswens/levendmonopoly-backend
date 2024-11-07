@@ -9,6 +9,13 @@ namespace LevendMonopoly.Api.Models
         public Guid? OwnerId { get; set; }
         public bool Tax { get; set; } = false;
         public string? Image { get; set; }
+
+        public void ResetToUnsoldState()
+        {
+            Owner = null;
+            OwnerId = null;
+            Tax = false;
+        }
         
     }
 }

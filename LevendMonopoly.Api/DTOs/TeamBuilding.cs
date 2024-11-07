@@ -7,6 +7,7 @@ namespace LevendMonopoly.Api.DTOs
         public required Guid Id { get; init; }
         public required string Name { get; init; }
         public required int Price { get; init; }
+        public bool Tax { get; init; }
         public string? Image { get; init; }
     }
 }

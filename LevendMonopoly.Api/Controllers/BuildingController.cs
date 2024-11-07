@@ -31,11 +31,12 @@ namespace LevendMonopoly.Api.Controllers
             var teamBuildings = new List<TeamBuilding>();
             foreach (var building in buildings)
             {
-                teamBuildings.Add(new TeamBuilding { 
-                    Id = building.Id, 
-                    Name = building.Name, 
-                    Price = building.Price, 
-                    Image = building.Image 
+                teamBuildings.Add(new TeamBuilding {
+                    Id = building.Id,
+                    Name = building.Name,
+                    Price = building.Price,
+                    Tax = building.Tax,
+                    Image = building.Image
                 });
             }
             return teamBuildings;

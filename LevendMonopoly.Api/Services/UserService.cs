@@ -43,9 +43,9 @@ namespace LevendMonopoly.Api.Services
             return user;
         }
 
-        public Task<List<User>> GetUsersAsync()
+        public async Task<List<User>> GetUsersAsync()
         {
-            throw new NotImplementedException();
+            return await _context.Users.Include(u => u.Role).ToListAsync();
         }
 
         public Task<bool> UpdateUserAsync(User user, Guid id)
