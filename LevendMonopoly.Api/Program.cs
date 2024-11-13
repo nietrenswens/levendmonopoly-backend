@@ -57,6 +57,7 @@ builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IBuildingService, BuildingService>();
 builder.Services.AddTransient<IGameSettingService, GameSettingsService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
+builder.Services.AddTransient<IPDFService, PDFService>();
 
 var app = builder.Build();
 

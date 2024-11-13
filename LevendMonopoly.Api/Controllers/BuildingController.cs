@@ -14,12 +14,14 @@ namespace LevendMonopoly.Api.Controllers
         private readonly IBuildingService _buildingService;
         private readonly ITeamService _teamService;
         private readonly IGameSettingService _gameSettingService;
+        private readonly IPDFService _pdfService;
 
-        public BuildingController(IBuildingService buildingService, ITeamService teamService, IGameSettingService gameSettingService)
+        public BuildingController(IBuildingService buildingService, ITeamService teamService, IGameSettingService gameSettingService, IPDFService pdfService)
         {
             _buildingService = buildingService;
             _gameSettingService = gameSettingService;
             _teamService = teamService;
+            _pdfService = pdfService;
         }
 
         [HttpGet]
@@ -110,7 +112,6 @@ namespace LevendMonopoly.Api.Controllers
 
             return await buy(building, team, command);
         }
-
         private async Task<ActionResult<BuyResult>> buy(Building building, Team team, BuyCommand command)
         {
             building.OwnerId = team.Id;

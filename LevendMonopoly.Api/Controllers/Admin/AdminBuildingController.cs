@@ -1,6 +1,7 @@
 ﻿using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Migrations;
 using LevendMonopoly.Api.Models;
+using LevendMonopoly.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -13,11 +14,13 @@ namespace LevendMonopoly.Api.Controllers.Admin
     {
         private readonly IBuildingService _buildingService;
         private readonly ITeamService _teamService;
+        private readonly IPDFService _pdfService;
 
-        public AdminBuildingController(IBuildingService buildingService, ITeamService teamService)
+        public AdminBuildingController(IBuildingService buildingService, ITeamService teamService, IPDFService pdfService)
         {
             _buildingService = buildingService;
             _teamService = teamService;
+            _pdfService = pdfService;
         }
 
         [HttpGet]
@@ -84,6 +87,14 @@ namespace LevendMonopoly.Api.Controllers.Admin
             existingBuilding.Tax = false;
             await _buildingService.UpdateBuildingAsync(existingBuilding);
             return Ok();
+        }
+
+        [HttpGet("export")]
+        public async Task<FileResult> Export()
+        {
+            var buildings = await _buildingService.GetBuildingsAsync();
+            var pdfData = _pdfService.ExportBuildingsToPdf(buildings.ToList());
+            return File(pdfData, "application/pdf", "buildings.pdf");
         }
     }
 

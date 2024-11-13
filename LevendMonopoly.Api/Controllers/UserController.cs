@@ -39,7 +39,21 @@ namespace LevendMonopoly.Api.Controllers
 
             return NoContent();
         }
-        
+
+        [HttpDelete("{id}")]
+        [Authorize(Policy = "UserOnly")]
+        public async Task<ActionResult> Post(Guid id)
+        {
+            if (await _userService.GetUserAsync(id) == null)
+            {
+                return NotFound();
+            }
+
+            await _userService.DeleteUserAsync(id);
+
+            return NoContent();
+        }
+
     }
 
     public class PostCommand

@@ -11,6 +11,7 @@ namespace LevendMonopoly.Api.Models
         public string PasswordSalt { get; set; } = null!;
         public int Balance { get; set; }
         public List<Building> Buildings { get; set; } = null!;
+        public List<ChanceCardPull> ChanceCardPulls { get; set; } = null!;
 
         public int Worth {
             get

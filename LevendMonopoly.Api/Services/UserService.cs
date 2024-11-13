@@ -32,9 +32,9 @@ namespace LevendMonopoly.Api.Services
             return await _context.SaveChangesAsync() > 0;
         }
 
-        public Task<User> GetUserAsync(Guid id)
+        public Task<User?> GetUserAsync(Guid id)
         {
-            throw new NotImplementedException();
+            return _context.Users.FirstOrDefaultAsync(u => u.Id == id);
         }
 
         public User? GetUser(Func<User, bool> predicate)
