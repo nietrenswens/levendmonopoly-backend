@@ -33,4 +33,4 @@ jobs:
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/levendmonopoly-backend:latest
           docker stop levendmonopoly-backend || true
           docker rm levendmonopoly-backend || true
-          docker run -d -p 5000:5000 --name levendmonopoly-backend ${{ secrets.DOCKERHUB_USERNAME }}/levendmonopoly-backend:latest
+          docker run -d -p 5000:5000 -p 5001:5001 --name levendmonopoly-backend ${{ secrets.DOCKERHUB_USERNAME }}/levendmonopoly-backend:latest
