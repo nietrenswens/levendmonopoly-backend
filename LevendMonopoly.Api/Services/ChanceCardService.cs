@@ -1,5 +1,6 @@
 ﻿using LevendMonopoly.Api.Data;
 using LevendMonopoly.Api.Interfaces.Services;
+using LevendMonopoly.Api.Models;
 using LevendMonopoly.Api.Records;
 using Microsoft.EntityFrameworkCore;
 
@@ -34,9 +35,14 @@ namespace LevendMonopoly.Api.Services
 
         public DateTime LastPull(Guid teamId)
         {
-            var team = _context.Teams.Include(u => u.ChanceCardPulls).FirstOrDefault(u => u.Id == teamId);
-            if (team == null || team.ChanceCardPulls.Count == 0) return DateTime.MinValue;
-            return team.ChanceCardPulls.OrderByDescending(c => c.DateTime).First().DateTime;
+            var chancePulls = _context.ChanceCardPulls.Where(c => c.TeamId == teamId).ToList();
+            return chancePulls.OrderByDescending(c => c.DateTime).FirstOrDefault()?.DateTime ?? DateTime.MinValue;
+        }
+
+        public async Task AddPull(Guid teamId, DateTime now)
+        {
+            await _context.ChanceCardPulls.AddAsync(new ChanceCardPull { TeamId = teamId, DateTime = now.ToUniversalTime() });
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -56,6 +56,7 @@ builder.Services.AddTransient<IUserService, UserService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IBuildingService, BuildingService>();
 builder.Services.AddTransient<IGameSettingService, GameSettingsService>();
+builder.Services.AddTransient<IChanceCardService, ChanceCardService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IPDFService, PDFService>();
 

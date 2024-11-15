@@ -6,5 +6,6 @@ namespace LevendMonopoly.Api.Interfaces.Services
     {
         ChanceCard PullChanceCard();
         DateTime LastPull(Guid teamId);
+        Task AddPull(Guid teamId, DateTime now);
     }
 }

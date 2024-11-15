@@ -54,19 +54,18 @@ namespace LevendMonopoly.Api.Controllers
             return NoContent();
         }
 
-        [HttpPost("chance")]
-        [Authorize(Policy = "UserOnly")]
-        public async Task<ActionResult<ChanceCard>> Chance([FromBody] Guid TeamId)
+        [HttpPost("{teamId}/chance")]
+        public async Task<ActionResult<ChanceCard>> Chance(Guid teamId)
         {
             var chanceCard = _chanceCardService.PullChanceCard();
-            var teamId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "id")!.Value);
             var team = await _teamService.GetTeamAsync(teamId);
             if (team == null) return NotFound();
-
-            var timeSinceLastPull = DateTime.Now - _chanceCardService.LastPull(teamId);
+            var lastpull = _chanceCardService.LastPull(teamId);
+            var timeSinceLastPull = DateTime.Now.ToUniversalTime() - lastpull;
             if (timeSinceLastPull < TimeSpan.FromMinutes(3))
                 return BadRequest("Je mag maar 1 keer per 3 minuten een kanskaart trekken.");
 
+            await _chanceCardService.AddPull(teamId, DateTime.Now);
             team.Balance += chanceCard.Result;
             await _teamService.UpdateTeamAsync(team);
             return Ok(chanceCard);
