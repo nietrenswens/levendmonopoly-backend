@@ -28,8 +28,7 @@ jobs:
         host: ${{ secrets.SSH_HOST }}
         port: ${{ secrets.SSH_PORT }}
         username: ${{ secrets.SSH_USERNAME }}
-        key: ${{ secrets.SSH_KEY }}
-        passphrase: ${{ secrets.SSH_PASS }}
+        password: ${{ secrets.SSH_PASS }}
         script: 
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/levendmonopoly-backend:latest
           docker stop levendmonopoly-backend || true
