@@ -60,6 +60,14 @@ builder.Services.AddTransient<IChanceCardService, ChanceCardService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IPDFService, PDFService>();
 
+builder.WebHost.ConfigureKestrel(options =>
+{
+    options.ListenAnyIP(5001, listenOptions =>
+    {
+        listenOptions.UseHttps("/root/.aspnet/https/aspnetapp.pfx");
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
