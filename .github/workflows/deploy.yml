@@ -33,4 +33,7 @@ jobs:
           docker pull ${{ secrets.DOCKERHUB_USERNAME }}/levendmonopoly-backend:latest
           docker stop levendmonopoly-backend || true
           docker rm levendmonopoly-backend || true
+          mkdir -p ${HOME}/.aspnet/https
+          dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx
+          dotnet dev-certs https --trust
           docker run -d -p 5000:5000 -p 5001:5001 -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ --name levendmonopoly-backend ${{ secrets.DOCKERHUB_USERNAME }}/levendmonopoly-backend:latest
