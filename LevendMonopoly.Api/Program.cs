@@ -67,7 +67,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 app.Urls.Add("http://*:5000");
+app.Urls.Add("https://*:5001");
 
 app.UseAuthentication();
 app.UseAuthorization();
