@@ -34,6 +34,4 @@ jobs:
           docker stop levendmonopoly-backend || true
           docker rm levendmonopoly-backend || true
           mkdir -p ${HOME}/.aspnet/https/aspnetapp.pfx
-          dotnet dev-certs https -ep ${HOME}/.aspnet/https/aspnetapp.pfx -p ${{ secrets.SSH_PASS }}
-          dotnet dev-certs https --trust
-          docker run -d -p 5000:5000 -p 5001:5001 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=5001 -e ASPNETCORE_Kestrel__Certificates__Default__Password="${{ secrets.SSH_PASS }}" -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ --name levendmonopoly-backend ${{ secrets.DOCKERHUB_USERNAME }}/levendmonopoly-backend:latest
+          docker run -d -p 5000:5000 -p 5001:5001 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORTS=5001 -e ASPNETCORE_Kestrel__Certificates__Default__Path=/https/aspnetapp.pfx -v ${HOME}/.aspnet/https:/https/ --name levendmonopoly-backend ${{ secrets.DOCKERHUB_USERNAME }}/levendmonopoly-backend:latest
