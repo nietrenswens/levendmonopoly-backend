@@ -6,7 +6,7 @@ RUN dotnet restore
 RUN dotnet publish -c Release -o out
 RUN dotnet tool install --version 6.0.9 --global dotnet-ef
 ENV PATH="$PATH:/root/.dotnet/tools"
-ENTRYPOINT dotnet-ef database update
+RUN dotnet-ef database update
 
 # Run
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
