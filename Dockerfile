@@ -9,4 +9,6 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
 COPY --from=build /app/out .
+RUN dotnet tool install --global dotnet-ef
+RUN dotnet ef database update
 CMD dotnet LevendMonopoly.Api.dll
