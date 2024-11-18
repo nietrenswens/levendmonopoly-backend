@@ -25,7 +25,7 @@ namespace LevendMonopoly.Api.Services
                 PdfPage page = pdf.AddPage();
                 XGraphics gfx = XGraphics.FromPdfPage(page);
                 XFont big = new XFont("Arial ", 32);
-                XFont medium = new XFont("Arial ", 18);
+                XFont medium = new XFont("Arial ", 16);
                 XFont small = new XFont("Arial ", 8);
                 gfx.DrawString(building.Name, big, XBrushes.Black, new XRect(0, 0, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
                 gfx.DrawString($"€{building.Price}", medium, XBrushes.Black, new XRect(0, page.Height.Point / 4, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
