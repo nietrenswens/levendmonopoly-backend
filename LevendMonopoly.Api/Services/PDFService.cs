@@ -25,8 +25,10 @@ namespace LevendMonopoly.Api.Services
                 PdfPage page = pdf.AddPage();
                 XGraphics gfx = XGraphics.FromPdfPage(page);
                 XFont font = new XFont("Verdana", 32);
+                XFont medium = new XFont("Verdana", 18);
                 XFont small = new XFont("Verdana", 8);
                 gfx.DrawString(building.Name, font, XBrushes.Black, new XRect(0, 0, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
+                gfx.DrawString($"€{building.Price}", font, XBrushes.Black, new XRect(0, page.Height.Point / 4, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
                 gfx.DrawString($"{count}", small, XBrushes.Black, new XRect(50, page.Height.Point - 50, 0,0), XStringFormats.BaseLineLeft);
                 gfx.DrawString("Levend Monopoly", small, XBrushes.Black, new XRect(page.Width.Point - 50, page.Height.Point - 50, 0,0), XStringFormats.BaseLineRight);
 
