@@ -24,11 +24,11 @@ namespace LevendMonopoly.Api.Services
                 count++;
                 PdfPage page = pdf.AddPage();
                 XGraphics gfx = XGraphics.FromPdfPage(page);
-                XFont font = new XFont("Arial", 32);
-                XFont medium = new XFont("Arial", 18);
-                XFont small = new XFont("Arial", 8);
-                gfx.DrawString(building.Name, font, XBrushes.Black, new XRect(0, 0, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
-                gfx.DrawString($"€{building.Price}", font, XBrushes.Black, new XRect(0, page.Height.Point / 4, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
+                XFont big = new XFont("MSSansSerif ", 32);
+                XFont medium = new XFont("MSSansSerif ", 18);
+                XFont small = new XFont("MSSansSerif ", 8);
+                gfx.DrawString(building.Name, big, XBrushes.Black, new XRect(0, 0, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
+                gfx.DrawString($"€{building.Price}", medium, XBrushes.Black, new XRect(0, page.Height.Point / 4, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
                 gfx.DrawString($"{count}", small, XBrushes.Black, new XRect(50, page.Height.Point - 50, 0,0), XStringFormats.BaseLineLeft);
                 gfx.DrawString("Levend Monopoly", small, XBrushes.Black, new XRect(page.Width.Point - 50, page.Height.Point - 50, 0,0), XStringFormats.BaseLineRight);
 
