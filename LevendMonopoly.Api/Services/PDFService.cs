@@ -24,11 +24,11 @@ namespace LevendMonopoly.Api.Services
                 count++;
                 PdfPage page = pdf.AddPage();
                 XGraphics gfx = XGraphics.FromPdfPage(page);
-                XFont big = new XFont("Arial ", 32);
-                XFont medium = new XFont("Arial ", 16);
-                XFont small = new XFont("Arial ", 8);
+                XFont font = new XFont("Roboto", 16);
+                XFont big = new XFont("Roboto", 48);
+                XFont small = new XFont("Roboto", 8);
                 gfx.DrawString(building.Name, big, XBrushes.Black, new XRect(0, 0, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
-                gfx.DrawString($"€{building.Price}", medium, XBrushes.Black, new XRect(0, page.Height.Point / 4, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
+                gfx.DrawString($"€{building.Price}", font, XBrushes.Black, new XRect(0, 60, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
                 gfx.DrawString($"{count}", small, XBrushes.Black, new XRect(50, page.Height.Point - 50, 0,0), XStringFormats.BaseLineLeft);
                 gfx.DrawString("Levend Monopoly", small, XBrushes.Black, new XRect(page.Width.Point - 50, page.Height.Point - 50, 0,0), XStringFormats.BaseLineRight);
 

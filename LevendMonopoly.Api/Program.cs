@@ -6,6 +6,7 @@ using LevendMonopoly.Api.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using PdfSharp.Fonts;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -59,6 +60,8 @@ builder.Services.AddTransient<IGameSettingService, GameSettingsService>();
 builder.Services.AddTransient<IChanceCardService, ChanceCardService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IPDFService, PDFService>();
+
+GlobalFontSettings.FontResolver = new RobotoFontResolver();
 
 var app = builder.Build();
 

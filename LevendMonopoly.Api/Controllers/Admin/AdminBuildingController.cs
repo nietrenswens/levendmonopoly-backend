@@ -1,7 +1,5 @@
 ﻿using LevendMonopoly.Api.Interfaces.Services;
-using LevendMonopoly.Api.Migrations;
 using LevendMonopoly.Api.Models;
-using LevendMonopoly.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
