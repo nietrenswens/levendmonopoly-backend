@@ -15,13 +15,15 @@ namespace LevendMonopoly.Api.Controllers
         private IBuildingService _buildingService;
         private IUserService _userService;
         private IChanceCardService _chanceCardService;
+        private ITransactionService _transactionService;
 
-        public TeamController(ITeamService teamService, IBuildingService buildingService, IUserService userService, IChanceCardService chanceCardService)
+        public TeamController(ITeamService teamService, IBuildingService buildingService, IUserService userService, IChanceCardService chanceCardService, ITransactionService transactionService)
         {
             _teamService = teamService;
             _buildingService = buildingService;
             _userService = userService;
             _chanceCardService = chanceCardService;
+            _transactionService = transactionService;
         }
 
         [HttpGet]
@@ -55,6 +57,7 @@ namespace LevendMonopoly.Api.Controllers
         }
 
         [HttpPost("{teamId}/chance")]
+        [Authorize(Policy = "UserOnly")]
         public async Task<ActionResult<ChanceCard>> Chance(Guid teamId)
         {
             var chanceCard = _chanceCardService.PullChanceCard();
@@ -68,6 +71,16 @@ namespace LevendMonopoly.Api.Controllers
             await _chanceCardService.AddPull(teamId, DateTime.Now);
             team.Balance += chanceCard.Result;
             await _teamService.UpdateTeamAsync(team);
+
+            _transactionService.AddTransaction(new Transaction
+            {
+                Amount = Math.Abs(chanceCard.Result),
+                Sender = chanceCard.Result > 0 ? null : teamId,
+                Receiver = chanceCard.Result > 0 ? teamId : null,
+                DateTime = DateTime.UtcNow,
+                Message = chanceCard.Prompt,
+            });
+
             return Ok(chanceCard);
         }
     }

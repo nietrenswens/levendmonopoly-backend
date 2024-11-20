@@ -2,6 +2,7 @@
 using LevendMonopoly.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace LevendMonopoly.Api.Controllers
 {
@@ -12,11 +13,13 @@ namespace LevendMonopoly.Api.Controllers
     {
         private readonly IBuildingService _buildingService;
         private readonly ITeamService _teamService;
+        private readonly ITransactionService _transactionService;
 
-        public MeController(IBuildingService buildingService, ITeamService teamService)
+        public MeController(IBuildingService buildingService, ITeamService teamService, ITransactionService transactionService)
         {
             _buildingService = buildingService;
             _teamService = teamService;
+            _transactionService = transactionService;
         }
 
         [HttpGet]
@@ -52,6 +55,19 @@ namespace LevendMonopoly.Api.Controllers
                 NumberOfBuildingsWithoutTax = buildings.Where(b => !b.Tax).Count(),
                 Position = position
             });
+        }
+
+        [HttpGet("transactions")]
+        public ActionResult<IEnumerable<Transaction>> GetTransactions([FromQuery] int page = 1)
+        {
+            var teamId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "id")!.Value);
+            try
+            {
+                return Ok(_transactionService.getTransactionsOfTeam(teamId, page));
+            } catch (ValidationException e)
+            {
+                return BadRequest(e.Message);
+            }
         }
     }
 

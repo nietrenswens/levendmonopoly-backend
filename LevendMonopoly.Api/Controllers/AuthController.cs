@@ -31,7 +31,8 @@ namespace LevendMonopoly.Api.Controllers
             return Ok(new LoginResult() {
                 Token = token,
                 Type = jwtSecToken!.Claims.First(claim => claim.Type == "type").Value,
-                Name = jwtSecToken!.Claims.First(claim => claim.Type == "name").Value
+                Name = jwtSecToken!.Claims.First(claim => claim.Type == "name").Value,
+                Id = Guid.Parse(jwtSecToken!.Claims.First(claim => claim.Type == "id").Value)
             });
         }
 
@@ -54,5 +55,6 @@ namespace LevendMonopoly.Api.Controllers
         public required string Token { get; set; }
         public required string Type { get; set; }
         public required string Name { get; set; }
+        public required Guid Id { get; set; }
     }
 }

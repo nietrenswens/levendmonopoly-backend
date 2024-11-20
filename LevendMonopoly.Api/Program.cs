@@ -60,6 +60,7 @@ builder.Services.AddTransient<IGameSettingService, GameSettingsService>();
 builder.Services.AddTransient<IChanceCardService, ChanceCardService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IPDFService, PDFService>();
+builder.Services.AddTransient<ITransactionService, TransactionService>();
 
 GlobalFontSettings.FontResolver = new RobotoFontResolver();
 

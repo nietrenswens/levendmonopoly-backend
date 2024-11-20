@@ -15,6 +15,7 @@ namespace LevendMonopoly.Api.Data
         public DbSet<GameSettings> GameSettings { get; set; } = null!;
         public DbSet<TeamSession> TeamSessions { get; set; } = null!;
         public DbSet<ChanceCardPull> ChanceCardPulls { get; set; } = null!;
+        public DbSet<Transaction> Transactions { get; set; } = null!;
 
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {

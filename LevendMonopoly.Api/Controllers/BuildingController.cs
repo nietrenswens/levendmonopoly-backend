@@ -15,13 +15,15 @@ namespace LevendMonopoly.Api.Controllers
         private readonly ITeamService _teamService;
         private readonly IGameSettingService _gameSettingService;
         private readonly IPDFService _pdfService;
+        private readonly ITransactionService _transactionService;
 
-        public BuildingController(IBuildingService buildingService, ITeamService teamService, IGameSettingService gameSettingService, IPDFService pdfService)
+        public BuildingController(IBuildingService buildingService, ITeamService teamService, IGameSettingService gameSettingService, IPDFService pdfService, ITransactionService transactionService)
         {
             _buildingService = buildingService;
             _gameSettingService = gameSettingService;
             _teamService = teamService;
             _pdfService = pdfService;
+            _transactionService = transactionService;
         }
 
         [HttpGet]
@@ -103,12 +105,31 @@ namespace LevendMonopoly.Api.Controllers
                 team.Balance -= building.Price;
                 await _teamService.UpdateTeamAsync(otherTeam);
                 await _teamService.UpdateTeamAsync(team);
+
+                _transactionService.AddTransaction(new Transaction
+                {
+                    Amount = building.Price,
+                    Sender = team.Id,
+                    Receiver = otherTeam.Id,
+                    Message = $"{team.Name} heeft {otherTeam.Name} {building.Price} huur betaald.",
+                    DateTime = DateTime.UtcNow,
+                });
+
                 return Ok(new BuyResult()
                 {
                     Success = false,
                     Reason = $"Helaas, dit gebouw is al gekocht door {otherTeam.Name}. Je hebt hen {building.Price} betaald."
                 });
             }
+
+            _transactionService.AddTransaction(new Transaction
+            {
+                Amount = building.Price,
+                Sender = team.Id,
+                Receiver = null,
+                Message = $"{team.Name} heeft {building.Name} gekocht{(command.Tax ? " met belasting" : "")}.",
+                DateTime = DateTime.UtcNow,
+            });
 
             return await buy(building, team, command);
         }
