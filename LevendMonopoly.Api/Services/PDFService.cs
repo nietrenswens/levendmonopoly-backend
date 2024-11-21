@@ -14,6 +14,7 @@ namespace LevendMonopoly.Api.Services
         private Mutex mutex;
         private Mutex stringMutex;
         private Mutex imageMutex;
+        private int count;
 
         private readonly XFont font = new XFont("Arial", 16);
         private readonly XFont big = new XFont("Arial", 48);
@@ -25,14 +26,23 @@ namespace LevendMonopoly.Api.Services
             mutex = new Mutex();
             stringMutex = new();
             imageMutex = new();
+            count = 0;
         }
 
         public byte[] ExportBuildingsToPdf(List<Building> buildings)
         {
+            count = 0;
             PdfDocument pdf = new PdfDocument();
-            int count = 0;
-            var tasks = buildings.Select(building => Task.Run(() => renderPage(pdf, building, count))).ToArray();
 
+            // Pre-create pages to ensure order is maintained
+            var pages = buildings.Select(_ => pdf.AddPage()).ToArray();
+
+            // Render each page concurrently
+            var tasks = buildings
+                .Select((building, index) => Task.Run(() => RenderPage(pages[index], building)))
+                .ToArray();
+
+            // Wait for all tasks to complete
             Task.WaitAll(tasks);
 
             byte[] pdfBytes;
@@ -44,11 +54,12 @@ namespace LevendMonopoly.Api.Services
             return pdfBytes;
         }
 
-        private void renderPage(PdfDocument pdf, Building building, int count)
+        private void RenderPage(PdfPage page, Building building)
         {
+            int ownCount;
             mutex.WaitOne();
             count++;
-            PdfPage page = pdf.AddPage();
+            ownCount = count;
             mutex.ReleaseMutex();
 
             XGraphics gfx = XGraphics.FromPdfPage(page);
@@ -56,7 +67,7 @@ namespace LevendMonopoly.Api.Services
             stringMutex.WaitOne();
             gfx.DrawString(building.Name, big, XBrushes.Black, new XRect(0, 0, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
             gfx.DrawString($"€{building.Price}", font, XBrushes.Black, new XRect(0, 60, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
-            gfx.DrawString($"{count}", small, XBrushes.Black, new XRect(50, page.Height.Point - 50, 0, 0), XStringFormats.BaseLineLeft);
+            gfx.DrawString($"{ownCount}", small, XBrushes.Black, new XRect(50, page.Height.Point - 50, 0, 0), XStringFormats.BaseLineLeft);
             gfx.DrawString("Levend Monopoly", small, XBrushes.Black, new XRect(page.Width.Point - 50, page.Height.Point - 50, 0, 0), XStringFormats.BaseLineRight);
             stringMutex.ReleaseMutex();
 
