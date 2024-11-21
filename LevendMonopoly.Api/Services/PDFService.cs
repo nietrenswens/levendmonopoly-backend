@@ -3,6 +3,7 @@ using LevendMonopoly.Api.Models;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using QRCoder;
+using System.Drawing;
 
 namespace LevendMonopoly.Api.Services
 {
@@ -37,25 +38,16 @@ namespace LevendMonopoly.Api.Services
                     var base64Data = building.Image.Substring(building.Image.IndexOf(",") + 1);
                     byte[] imageBytes = Convert.FromBase64String(base64Data);
 
-                    using (MemoryStream ms = new MemoryStream(imageBytes, 0, imageBytes.Length, publiclyVisible: true, writable: false))
+                    try
                     {
-                        XImage image = XImage.FromStream(ms); // Convert base64 image to stream compatible with PdfSharp
-                        var imgWidth = page.Width.Point / 1.5;
-                        var imgHeight = page.Height.Point / 1.5;
-                        double aspectRatio = image.PixelWidth / (double)image.PixelHeight;
-
-                        if (imgWidth / aspectRatio <= imgHeight)
-                        {
-                            imgHeight = imgWidth / aspectRatio;
-                        }
-                        else
-                        {
-                            imgWidth = imgHeight * aspectRatio;
-                        }
-
-                        var x = (page.Width.Point - imgWidth) / 2;
-                        var y = (page.Height.Point - imgHeight) / 2 - 50;
-                        gfx.DrawImage(image, x, y, imgWidth, imgHeight);
+                        DrawImageCentered(gfx, imageBytes, page.Width.Point / 1.5, page.Height.Point / 1.5, page.Width.Point, page.Height.Point);
+                    } catch (Exception e)
+                    {
+                        Console.WriteLine($"An error occured while trying to draw the image for '{building.Name}({building.Id})': {e.Message}");
+                        var backupImage = File.OpenRead("Assets/Images/NoImage.jpg");
+                        byte[] backupImageBytes = new byte[backupImage.Length];
+                        backupImage.Read(backupImageBytes, 0, (int)backupImage.Length);
+                        DrawImageCentered(gfx, backupImageBytes, page.Width.Point / 1.5, page.Height.Point / 1.5, page.Width.Point, page.Height.Point);
                     }
                 }
 
@@ -65,10 +57,14 @@ namespace LevendMonopoly.Api.Services
                 QRCodeData qrCodeData = qrGenerator.CreateQrCode($"{url}{building.Id}", QRCodeGenerator.ECCLevel.Q);
                 var bitmap = new BitmapByteQRCode(qrCodeData);
                 byte[] qrCodeBytes = bitmap.GetGraphic(10);
-                MemoryStream qrStream = new MemoryStream(qrCodeBytes, 0, qrCodeBytes.Length, publiclyVisible: true, writable: false);
-                qrStream.Position = 0;
-                XImage qrImage = XImage.FromStream(qrStream);
-                gfx.DrawImage(qrImage, page.Width.Point / 2 - (100 / 2), page.Height.Point - 110 - 100, 100, 100);
+                try
+                {
+                    DrawImage(gfx, qrCodeBytes, page.Width.Point / 2 - (100 / 2), page.Height.Point - 110 - 100, 100, 100);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"An error occured while trying to draw the QR image for '{building.Name}({building.Id})': {e.Message}");
+                }
             }
 
             byte[] pdfBytes;
@@ -81,6 +77,52 @@ namespace LevendMonopoly.Api.Services
         }
 
 
+        private static void DrawImage(XGraphics gfx, byte[] imageData, double x, double y, double width, double height)
+        {
+            using (MemoryStream ms = new MemoryStream(imageData, 0, imageData.Length, publiclyVisible: true, writable: false))
+            {
+                Stream PNGstream = ConvertToPNGStream(ms);
+                XImage image = XImage.FromStream(PNGstream);
 
+                var (imgWidth, imgHeight) = WidthAndHeightByAspectRatio(width, height, image.PixelWidth, image.PixelHeight);
+                gfx.DrawImage(image, x, y, imgWidth, imgHeight);
+            }
+        }
+
+        private static void DrawImageCentered(XGraphics gfx, byte[] imageData, double width, double height, double pageWidth, double pageHeight)
+        {
+            using (MemoryStream ms = new MemoryStream(imageData, 0, imageData.Length, publiclyVisible: true, writable: false))
+            {
+                Stream PNGstream = ConvertToPNGStream(ms);
+                XImage image = XImage.FromStream(PNGstream);
+                var (imgWidth, imgHeight) = WidthAndHeightByAspectRatio(width, height, image.PixelWidth, image.PixelHeight);
+                var x = pageWidth / 2 - imgWidth / 2;
+                var y = pageHeight / 2 - imgHeight / 2;
+                gfx.DrawImage(image, x, y, imgWidth, imgHeight);
+            }
+        }
+
+        private static Tuple<double, double> WidthAndHeightByAspectRatio(double desiredWidth, double desiredHeight, double imageWidth, double imageHeight)
+        {
+            double aspectRatio = imageWidth / (double)imageHeight;
+
+            if (desiredWidth / aspectRatio <= desiredHeight)
+            {
+                desiredHeight = desiredWidth / aspectRatio;
+            }
+            else
+            {
+                desiredWidth = desiredHeight * aspectRatio;
+            }
+            return new Tuple<double, double>(desiredWidth, desiredHeight);
+        }
+
+        private static Stream ConvertToPNGStream(Stream nonPDFStream)
+        {
+            MemoryStream strm = new MemoryStream();
+            Image img = Image.FromStream(nonPDFStream);
+            img.Save(strm, System.Drawing.Imaging.ImageFormat.Png);
+            return strm;
+        }
     }
 }
