@@ -10,6 +10,7 @@ RUN dotnet publish -c Release -o out
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 RUN sed -i 's/Components: main*/& contrib/' /etc/apt/sources.list.d/debian.sources
 RUN apt update -y && apt install -y fontconfig ttf-mscorefonts-installer apt-utils libgdiplus libc6-dev
+RUN export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/lib/
 WORKDIR /app
 COPY --from=build /app/out .
 CMD dotnet LevendMonopoly.Api.dll
