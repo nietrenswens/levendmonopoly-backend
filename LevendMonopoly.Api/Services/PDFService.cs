@@ -11,62 +11,29 @@ namespace LevendMonopoly.Api.Services
     public class PDFService : IPDFService
     {
         private readonly IConfiguration _configuration;
+        private Mutex mutex;
+        private Mutex stringMutex;
+        private Mutex imageMutex;
+
+        private readonly XFont font = new XFont("Arial", 16);
+        private readonly XFont big = new XFont("Arial", 48);
+        private readonly XFont small = new XFont("Arial", 8);
 
         public PDFService(IConfiguration configuration)
         {
             _configuration = configuration;
+            mutex = new Mutex();
+            stringMutex = new();
+            imageMutex = new();
         }
 
         public byte[] ExportBuildingsToPdf(List<Building> buildings)
         {
             PdfDocument pdf = new PdfDocument();
             int count = 0;
-            foreach (Building building in buildings)
-            {
-                count++;
-                PdfPage page = pdf.AddPage();
-                XGraphics gfx = XGraphics.FromPdfPage(page);
-                XFont font = new XFont("Arial", 16);
-                XFont big = new XFont("Arial", 48);
-                XFont small = new XFont("Arial", 8);
-                gfx.DrawString(building.Name, big, XBrushes.Black, new XRect(0, 0, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
-                gfx.DrawString($"€{building.Price}", font, XBrushes.Black, new XRect(0, 60, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
-                gfx.DrawString($"{count}", small, XBrushes.Black, new XRect(50, page.Height.Point - 50, 0,0), XStringFormats.BaseLineLeft);
-                gfx.DrawString("Levend Monopoly", small, XBrushes.Black, new XRect(page.Width.Point - 50, page.Height.Point - 50, 0,0), XStringFormats.BaseLineRight);
+            var tasks = buildings.Select(building => Task.Run(() => renderPage(pdf, building, count))).ToArray();
 
-                if (!string.IsNullOrEmpty(building.Image))
-                {
-                    var base64Data = building.Image.Substring(building.Image.IndexOf(",") + 1);
-                    byte[] imageBytes = Convert.FromBase64String(base64Data);
-
-                    try
-                    {
-                        DrawImageCentered(gfx, imageBytes, page.Width.Point / 1.5, page.Height.Point / 1.5, page.Width.Point, page.Height.Point);
-                    } catch (Exception e)
-                    {
-                        Console.WriteLine($"An error occured while trying to draw the image for '{building.Name}({building.Id})': {e.Message}");
-                        var backupImage = File.OpenRead("Assets/Images/NoImage.jpg");
-                        byte[] backupImageBytes = new byte[backupImage.Length];
-                        backupImage.Read(backupImageBytes, 0, (int)backupImage.Length);
-                        DrawImageCentered(gfx, backupImageBytes, page.Width.Point / 1.5, page.Height.Point / 1.5, page.Width.Point, page.Height.Point);
-                    }
-                }
-
-                // Generate and draw QR code image
-                QRCodeGenerator qrGenerator = new QRCodeGenerator();
-                var url = _configuration.GetValue<string>("QRCode:Url");
-                QRCodeData qrCodeData = qrGenerator.CreateQrCode($"{url}{building.Id}", QRCodeGenerator.ECCLevel.Q);
-                var bitmap = new BitmapByteQRCode(qrCodeData);
-                byte[] qrCodeBytes = bitmap.GetGraphic(10);
-                try
-                {
-                    DrawImage(gfx, qrCodeBytes, page.Width.Point / 2 - (100 / 2), page.Height.Point - 110 - 100, 100, 100);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine($"An error occured while trying to draw the QR image for '{building.Name}({building.Id})': {e.Message}");
-                }
-            }
+            Task.WaitAll(tasks);
 
             byte[] pdfBytes;
             using (MemoryStream ms = new MemoryStream())
@@ -77,8 +44,59 @@ namespace LevendMonopoly.Api.Services
             return pdfBytes;
         }
 
+        private void renderPage(PdfDocument pdf, Building building, int count)
+        {
+            mutex.WaitOne();
+            count++;
+            PdfPage page = pdf.AddPage();
+            mutex.ReleaseMutex();
 
-        private static void DrawImage(XGraphics gfx, byte[] imageData, double x, double y, double width, double height)
+            XGraphics gfx = XGraphics.FromPdfPage(page);
+
+            stringMutex.WaitOne();
+            gfx.DrawString(building.Name, big, XBrushes.Black, new XRect(0, 0, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
+            gfx.DrawString($"€{building.Price}", font, XBrushes.Black, new XRect(0, 60, page.Width.Point, page.Height.Point / 4), XStringFormats.Center);
+            gfx.DrawString($"{count}", small, XBrushes.Black, new XRect(50, page.Height.Point - 50, 0, 0), XStringFormats.BaseLineLeft);
+            gfx.DrawString("Levend Monopoly", small, XBrushes.Black, new XRect(page.Width.Point - 50, page.Height.Point - 50, 0, 0), XStringFormats.BaseLineRight);
+            stringMutex.ReleaseMutex();
+
+            if (!string.IsNullOrEmpty(building.Image))
+            {
+                var base64Data = building.Image.Substring(building.Image.IndexOf(",") + 1);
+                byte[] imageBytes = Convert.FromBase64String(base64Data);
+
+                try
+                {
+                    DrawImageCentered(gfx, imageBytes, page.Width.Point / 1.5, page.Height.Point / 1.5, page.Width.Point, page.Height.Point);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine($"An error occured while trying to draw the image for '{building.Name}({building.Id})': {e.Message}");
+                    var backupImage = File.OpenRead("Assets/Images/NoImage.jpg");
+                    byte[] backupImageBytes = new byte[backupImage.Length];
+                    backupImage.Read(backupImageBytes, 0, (int)backupImage.Length);
+                    DrawImageCentered(gfx, backupImageBytes, page.Width.Point / 1.5, page.Height.Point / 1.5, page.Width.Point, page.Height.Point);
+                }
+            }
+
+            // Generate and draw QR code image
+            QRCodeGenerator qrGenerator = new QRCodeGenerator();
+            var url = _configuration.GetValue<string>("QRCode:Url");
+            QRCodeData qrCodeData = qrGenerator.CreateQrCode($"{url}{building.Id}", QRCodeGenerator.ECCLevel.Q);
+            var bitmap = new BitmapByteQRCode(qrCodeData);
+            byte[] qrCodeBytes = bitmap.GetGraphic(10);
+            try
+            {
+                DrawImage(gfx, qrCodeBytes, page.Width.Point / 2 - (100 / 2), page.Height.Point - 110 - 100, 100, 100);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"An error occured while trying to draw the QR image for '{building.Name}({building.Id})': {e.Message}");
+            }
+        }
+
+
+        private void DrawImage(XGraphics gfx, byte[] imageData, double x, double y, double width, double height)
         {
             using (MemoryStream ms = new MemoryStream(imageData, 0, imageData.Length, publiclyVisible: true, writable: false))
             {
@@ -86,11 +104,13 @@ namespace LevendMonopoly.Api.Services
                 XImage image = XImage.FromStream(PNGstream);
 
                 var (imgWidth, imgHeight) = WidthAndHeightByAspectRatio(width, height, image.PixelWidth, image.PixelHeight);
+                imageMutex.WaitOne();
                 gfx.DrawImage(image, x, y, imgWidth, imgHeight);
+                imageMutex.ReleaseMutex();
             }
         }
 
-        private static void DrawImageCentered(XGraphics gfx, byte[] imageData, double width, double height, double pageWidth, double pageHeight)
+        private void DrawImageCentered(XGraphics gfx, byte[] imageData, double width, double height, double pageWidth, double pageHeight)
         {
             using (MemoryStream ms = new MemoryStream(imageData, 0, imageData.Length, publiclyVisible: true, writable: false))
             {
@@ -99,7 +119,9 @@ namespace LevendMonopoly.Api.Services
                 var (imgWidth, imgHeight) = WidthAndHeightByAspectRatio(width, height, image.PixelWidth, image.PixelHeight);
                 var x = pageWidth / 2 - imgWidth / 2;
                 var y = pageHeight / 2 - imgHeight / 2;
+                imageMutex.WaitOne();
                 gfx.DrawImage(image, x, y, imgWidth, imgHeight);
+                imageMutex.ReleaseMutex();
             }
         }
 
