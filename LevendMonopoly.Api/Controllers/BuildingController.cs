@@ -124,7 +124,7 @@ namespace LevendMonopoly.Api.Controllers
 
             _transactionService.AddTransaction(new Transaction
             {
-                Amount = building.Price,
+                Amount = building.Price + (int)(building.Price * (1 + _gameSettingService.GetGameSettings().TaxRate)),
                 Sender = team.Id,
                 Receiver = null,
                 Message = $"{team.Name} heeft {building.Name} gekocht{(command.Tax ? " met belasting" : "")}.",
