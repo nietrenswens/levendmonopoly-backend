@@ -3,6 +3,7 @@ using LevendMonopoly.Api.Models;
 using PdfSharp.Drawing;
 using PdfSharp.Pdf;
 using QRCoder;
+using SixLabors.ImageSharp;
 using System.Drawing;
 
 namespace LevendMonopoly.Api.Services
@@ -119,10 +120,11 @@ namespace LevendMonopoly.Api.Services
 
         private static Stream ConvertToPNGStream(Stream nonPDFStream)
         {
-            MemoryStream strm = new MemoryStream();
-            Image img = Image.FromStream(nonPDFStream);
-            img.Save(strm, System.Drawing.Imaging.ImageFormat.Png);
-            return strm;
+            MemoryStream ms = new MemoryStream();
+            SixLabors.ImageSharp.Image image = SixLabors.ImageSharp.Image.Load(nonPDFStream);
+            image.SaveAsPng(ms);
+            ms.Position = 0;
+            return ms;
         }
     }
 }
