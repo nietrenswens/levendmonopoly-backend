@@ -44,5 +44,11 @@ namespace LevendMonopoly.Api.Services
             await _context.ChanceCardPulls.AddAsync(new ChanceCardPull { TeamId = teamId, DateTime = now.ToUniversalTime() });
             await _context.SaveChangesAsync();
         }
+
+        public void ResetPulls()
+        {
+            _context.ChanceCardPulls.Clear();
+            _context.SaveChanges();
+        }
     }
 }

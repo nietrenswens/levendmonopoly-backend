@@ -57,5 +57,16 @@ namespace LevendMonopoly.Api.Services
             _context.UpdateRange(buildings);
             await _context.SaveChangesAsync();
         }
+
+        public async Task ResetAllBuildings()
+        {
+            var buildings = await _context.Buildings.ToListAsync();
+            buildings.ForEach(building =>
+            {
+                building.ResetToUnsoldState();
+            });
+            _context.UpdateRange(buildings);
+            await _context.SaveChangesAsync();
+        }
     }
 }

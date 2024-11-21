@@ -6,5 +6,6 @@ namespace LevendMonopoly.Api.Interfaces.Services
     {
         IEnumerable<Transaction> getTransactionsOfTeam(Guid teamId, int page);
         void AddTransaction(Transaction transaction);
+        void ResetTransactions();
     }
 }

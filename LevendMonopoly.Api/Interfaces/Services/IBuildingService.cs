@@ -11,5 +11,6 @@ namespace LevendMonopoly.Api.Interfaces.Services
         Task DeleteBuildingAsync(Guid id);
         Task UpdateBuildingAsync(Building building);
         Task ResetBuildingsState(Guid teamId);
+        Task ResetAllBuildings();
     }
 }

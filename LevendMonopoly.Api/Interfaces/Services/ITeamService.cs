@@ -10,5 +10,6 @@ namespace LevendMonopoly.Api.Interfaces.Services
         Task<Team?> GetTeamAsync(Guid teamId);
         Task<Team?> GetTeamByNameAsync(string name);
         Task<List<Team>> GetAllTeamsAsync(bool includeBuildings = false);
+        Task ResetAllTeams();
     }
 }

@@ -30,6 +30,11 @@ namespace LevendMonopoly.Api.Models
             }
         }
 
+        public void Reset()
+        {
+            Balance = 5000;
+        }
+
         public static Team CreateNewTeam(string name, string password)
         {
             var salt = Cryptography.GenerateSalt();

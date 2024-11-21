@@ -1,6 +1,7 @@
 ﻿using LevendMonopoly.Api.Data;
 using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
+using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
 
 namespace LevendMonopoly.Api.Services
@@ -31,6 +32,12 @@ namespace LevendMonopoly.Api.Services
             return _context.Transactions.OrderByDescending(transaction => transaction.DateTime)
                 .Where(transaction => transaction.Receiver == teamId || transaction.Sender == teamId)
                 .Take(15).Skip(indx * 15).ToList();
+        }
+
+        public void ResetTransactions()
+        {
+            _context.Transactions.Clear();
+            _context.SaveChanges();
         }
     }
 }

@@ -47,6 +47,14 @@ namespace LevendMonopoly.Api.Services
             return await _context.Teams.Include(t => t.Buildings).FirstOrDefaultAsync(team => team.Name.ToLower() == name.ToLower());
         }
 
+        public async Task ResetAllTeams()
+        {
+            var teams = await _context.Teams.ToListAsync();
+            teams.ForEach(team => team.Reset());
+            _context.Teams.UpdateRange(teams);
+            await _context.SaveChangesAsync();
+        }
+
         public async Task UpdateTeamAsync(Team team)
         {
             _context.Teams.Update(team);
