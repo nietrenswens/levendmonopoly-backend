@@ -16,13 +16,12 @@ namespace LevendMonopoly.Api.Services
 
         public async Task<IEnumerable<Building>> GetBuildingsAsync(Guid teamId)
         {
-            var result = await _context.Buildings.Where(building => building.OwnerId == teamId).ToListAsync();
-            return await _context.Buildings.Where(building => building.OwnerId == teamId).ToListAsync();
+            return await _context.Buildings.Where(building => building.OwnerId == teamId).OrderByDescending(b => b.Created).ToListAsync();
         }
 
         public async Task<IEnumerable<Building>> GetBuildingsAsync()
         {
-            return await _context.Buildings.ToListAsync();
+            return await _context.Buildings.OrderByDescending(b => b.Created).ToListAsync();
         }
 
         public async Task CreateBuildingAsync(Building building)
