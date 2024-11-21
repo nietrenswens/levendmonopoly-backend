@@ -1,5 +1,8 @@
 # Build
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+
+RUN apt update -y && apt install fontconfig ttf-mscorefonts-installer -y
+
 WORKDIR /app
 COPY LevendMonopoly.Api/. .
 RUN dotnet restore
