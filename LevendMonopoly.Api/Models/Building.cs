@@ -1,6 +1,8 @@
+using LevendMonopoly.Api.Interfaces;
+
 namespace LevendMonopoly.Api.Models
 {
-    public class Building
+    public class Building : IHasID
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public required string Name { get; set; } = null!;

@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LevendMonopoly.Api.Models
 {
-    public class User : IIdentityEntity
+    public class User : IIdentityEntity, IHasID
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
@@ -17,6 +17,12 @@ namespace LevendMonopoly.Api.Models
 
         public User() : base()
         {
+        }
+
+        public void ChangePassword(string password)
+        {
+            byte[] salt = Convert.FromBase64String(PasswordSalt);
+            PasswordHash = Cryptography.HashPassword(password, salt);
         }
 
         override public string ToString()

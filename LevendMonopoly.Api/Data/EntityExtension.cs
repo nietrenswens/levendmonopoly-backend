@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LevendMonopoly.Api.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace LevendMonopoly.Api.Data
 {

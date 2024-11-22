@@ -1,6 +1,8 @@
-﻿namespace LevendMonopoly.Api.Models
+﻿using LevendMonopoly.Api.Interfaces;
+
+namespace LevendMonopoly.Api.Models
 {
-    public class TeamSession
+    public class TeamSession : IHasID
     {
         public Guid Id { get; set; }
         public Guid TeamId { get; set; }

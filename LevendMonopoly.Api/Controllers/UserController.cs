@@ -1,5 +1,6 @@
 using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
+using LevendMonopoly.Api.Utils;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -31,18 +32,16 @@ namespace LevendMonopoly.Api.Controllers
         [Authorize(Policy = "UserOnly")]
         public async Task<ActionResult> Post(PostCommand command)
         {
-            if (await _teamService.GetTeamByNameAsync(command.Name) != null || _userService.GetUser(u => u.Name == command.Name) != null)
-                return BadRequest("Gebruiker bestaat al");
-
-            var user = Models.User.CreateNewUser(command.Name, command.Password, command.RoleId);
-            await _userService.CreateUserAsync(user);
+            var result = await _userService.CreateUserIfNotExistsAsync(command.Name, command.Password, command.RoleId);
+            if (!result.IsSuccess)
+                return BadRequest(result.ErrorMessage);
 
             return NoContent();
         }
 
         [HttpDelete("{id}")]
         [Authorize(Policy = "UserOnly")]
-        public async Task<ActionResult> Post(Guid id)
+        public async Task<ActionResult> Delete(Guid id)
         {
             if (await _userService.GetUserAsync(id) == null)
             {
@@ -54,6 +53,33 @@ namespace LevendMonopoly.Api.Controllers
             return NoContent();
         }
 
+        [HttpPut("{id}")]
+        [Authorize(Policy = "UserOnly")]
+        public async Task<ActionResult> Put([FromBody] PutCommand command, Guid id)
+        {
+            var user = await _userService.GetUserAsync(id);
+            if (user == null) return NotFound();
+            var oldPasswordHash = Cryptography.HashPassword(command.OldPassword, Convert.FromBase64String(user.PasswordSalt));
+            if (oldPasswordHash != user.PasswordHash) return Forbid();
+
+            if (command.NewPassword != null)
+            {
+                user.ChangePassword(command.NewPassword);
+            }
+            user.Name = command.UserName;
+
+            await _userService.UpdateUserAsync(user);
+
+            return NoContent();
+        }
+
+    }
+
+    public class PutCommand
+    {
+        public required string UserName { get; init; }
+        public required string OldPassword { get; init; }
+        public string? NewPassword { get; init; }
     }
 
     public class PostCommand

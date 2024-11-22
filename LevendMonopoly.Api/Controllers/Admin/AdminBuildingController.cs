@@ -2,6 +2,7 @@
 using LevendMonopoly.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using SixLabors.ImageSharp.Metadata.Profiles.Exif;
 
 namespace LevendMonopoly.Api.Controllers.Admin
 {
@@ -94,6 +95,25 @@ namespace LevendMonopoly.Api.Controllers.Admin
             var pdfData = _pdfService.ExportBuildingsToPdf(buildings.ToList());
             return File(pdfData, "application/pdf", "buildings.pdf");
         }
+
+        [HttpGet("exportjson")]
+        public async Task<FileResult> ExportJson()
+        {
+            var data = await _buildingService.ExportAsJSON();
+            var bytes = System.Text.Encoding.UTF8.GetBytes(data);
+            return File(bytes, "application/json", "buildings.json");
+        }
+
+        [HttpPost("importjson")]
+        public async Task<ActionResult> ImportJson([FromBody] ImportJsonCommand command)
+        {
+            byte[] jsonBytes = Convert.FromBase64String(command.Data);
+            string decodedJson = System.Text.Encoding.UTF8.GetString(jsonBytes);
+            var result = await _buildingService.ImportFromJSON(decodedJson);
+            if (!result.IsSuccess)
+                return BadRequest("Bestand kon niet geladen worden");
+            return NoContent();
+        }
     }
 
     public record DeleteCommand
@@ -113,4 +133,10 @@ namespace LevendMonopoly.Api.Controllers.Admin
         public required int Price { get; init; }
         public string? Image { get; init; }
     }
+
+    public class ImportJsonCommand
+    {
+        public required string Data { get; init; }
+    }
+
 }

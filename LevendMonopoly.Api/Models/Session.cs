@@ -1,8 +1,9 @@
+using LevendMonopoly.Api.Interfaces;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace LevendMonopoly.Api.Models
 {
-    public class Session
+    public class Session : IHasID
     {
         public Guid Id { get; set; }
         [ForeignKey("User")]

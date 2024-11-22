@@ -1,4 +1,6 @@
-﻿namespace LevendMonopoly.Api.Models
+﻿using LevendMonopoly.Api.Interfaces;
+
+namespace LevendMonopoly.Api.Models
 {
     public class GameSettings
     {

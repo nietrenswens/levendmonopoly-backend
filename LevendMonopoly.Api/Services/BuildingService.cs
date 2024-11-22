@@ -1,7 +1,11 @@
-﻿using LevendMonopoly.Api.Data;
+﻿using CsvHelper;
+using LevendMonopoly.Api.Data;
 using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
+using LevendMonopoly.Api.Utils;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
+using System.Text.Json;
 
 namespace LevendMonopoly.Api.Services
 {
@@ -67,6 +71,32 @@ namespace LevendMonopoly.Api.Services
             });
             _context.UpdateRange(buildings);
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<string> ExportAsJSON()
+        {
+            var buildings = await _context.Buildings.ToListAsync();
+            var json = JsonSerializer.Serialize(buildings);
+            return json;
+        }
+
+        public async Task<Result> ImportFromJSON(string data)
+        {
+            try
+            {
+                var buildings = JsonSerializer.Deserialize<Building[]>(data);
+                if (buildings == null)
+                    return Result.Failure("Het opgegeven bestand kan niet geladen worden");
+
+                _context.Buildings.UpdateRange(buildings);
+
+                await _context.SaveChangesAsync();
+            }
+            catch (Exception e)
+            {
+                return Result.Failure(e.Message);
+            }
+            return Result.Success();
         }
     }
 }

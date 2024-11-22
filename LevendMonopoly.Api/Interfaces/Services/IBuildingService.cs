@@ -1,4 +1,5 @@
 ﻿using LevendMonopoly.Api.Models;
+using LevendMonopoly.Api.Utils;
 
 namespace LevendMonopoly.Api.Interfaces.Services
 {
@@ -12,5 +13,7 @@ namespace LevendMonopoly.Api.Interfaces.Services
         Task UpdateBuildingAsync(Building building);
         Task ResetBuildingsState(Guid teamId);
         Task ResetAllBuildings();
+        Task<string> ExportAsJSON();
+        Task<Result> ImportFromJSON(string data);
     }
 }

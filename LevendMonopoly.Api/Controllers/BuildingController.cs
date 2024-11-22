@@ -133,6 +133,7 @@ namespace LevendMonopoly.Api.Controllers
 
             return await buy(building, team, command);
         }
+
         private async Task<ActionResult<BuyResult>> buy(Building building, Team team, BuyCommand command)
         {
             building.OwnerId = team.Id;

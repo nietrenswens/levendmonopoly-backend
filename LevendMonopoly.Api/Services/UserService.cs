@@ -1,6 +1,7 @@
 using LevendMonopoly.Api.Data;
 using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
+using LevendMonopoly.Api.Utils;
 using Microsoft.EntityFrameworkCore;
 
 namespace LevendMonopoly.Api.Services
@@ -8,16 +9,20 @@ namespace LevendMonopoly.Api.Services
     public class UserService : IUserService
     {
         private DataContext _context;
+        private ITeamService _teamService;
 
-        public UserService(DataContext context)
+        public UserService(DataContext context, ITeamService teamService)
         {
             _context = context;
+            _teamService = teamService;
         }
 
-        public async Task<bool> CreateUserAsync(User user)
+        public async Task<Result> CreateUserIfNotExistsAsync(string name, string password, Guid roleId)
         {
-            await _context.Users.AddAsync(user);
-            return await _context.SaveChangesAsync() > 0;
+            if (await _teamService.GetTeamByNameAsync(name) != null || GetUser(u => u.Name == name) != null)
+                return Result.Failure("Gebruiker bestaat al");
+            await _context.Users.AddAsync(User.CreateNewUser(name, password, roleId));
+            return Result.Success();
         }
 
         public async Task<bool> DeleteUserAsync(Guid id)
@@ -48,9 +53,10 @@ namespace LevendMonopoly.Api.Services
             return await _context.Users.Include(u => u.Role).ToListAsync();
         }
 
-        public Task<bool> UpdateUserAsync(User user, Guid id)
+        public async Task UpdateUserAsync(User user)
         {
-            throw new NotImplementedException();
+            _context.Users.Update(user);
+            await _context.SaveChangesAsync();
         }
     }
 }

@@ -1,12 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using LevendMonopoly.Api.Interfaces;
+using System.ComponentModel.DataAnnotations;
 
 namespace LevendMonopoly.Api.Models
 {
-    public class Transaction
+    public class Transaction : IHasID
     {
         private int amount;
 
-        public Guid Id { get; init; } = new Guid();
+        public Guid Id { get; set; } = new Guid();
         public Guid? Sender { get; init; }
         public Guid? Receiver { get; init; }
         public required int Amount

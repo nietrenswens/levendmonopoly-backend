@@ -1,6 +1,8 @@
+using LevendMonopoly.Api.Interfaces;
+
 namespace LevendMonopoly.Api.Models
 {
-    public class Log
+    public class Log : IHasID
     {
         public Guid Id { get; set; }
         public bool Suspicious { get; set; } = false;

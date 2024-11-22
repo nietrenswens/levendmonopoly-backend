@@ -3,7 +3,7 @@ using LevendMonopoly.Api.Utils;
 
 namespace LevendMonopoly.Api.Models
 {
-    public class Team : IIdentityEntity
+    public class Team : IIdentityEntity, IHasID
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = null!;
