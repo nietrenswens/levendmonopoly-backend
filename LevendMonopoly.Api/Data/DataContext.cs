@@ -27,7 +27,8 @@ namespace LevendMonopoly.Api.Data
             modelBuilder.Entity<GameSettings>().HasData(new GameSettings
             {
                 Id = 1,
-                TaxRate = 0.6m
+                TaxRate = 0.6m,
+                Paused = false,
             });
 
             Guid adminRoleGuid = Guid.NewGuid();

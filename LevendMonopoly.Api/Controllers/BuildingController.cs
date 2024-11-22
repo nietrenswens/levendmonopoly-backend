@@ -1,4 +1,5 @@
 ﻿using LevendMonopoly.Api.DTOs;
+using LevendMonopoly.Api.Filters;
 using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -67,6 +68,7 @@ namespace LevendMonopoly.Api.Controllers
         }
 
         [HttpPost("buy")]
+        [TypeFilter(typeof(PauseFilter))]
         public async Task<ActionResult<BuyResult>> Buy(BuyCommand command)
         {
             var teamId = Guid.Parse(User.Claims.FirstOrDefault(c => c.Type == "id")!.Value);

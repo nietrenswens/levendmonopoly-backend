@@ -15,6 +15,7 @@ namespace LevendMonopoly.Api.Services
 
         public GameSettings GetGameSettings()
         {
+            var data = _context.GameSettings.Single();
             return _context.GameSettings.Single();
         }
 

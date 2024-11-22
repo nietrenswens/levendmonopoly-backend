@@ -1,4 +1,5 @@
-﻿using LevendMonopoly.Api.Interfaces.Services;
+﻿using LevendMonopoly.Api.Filters;
+using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using LevendMonopoly.Api.Records;
 using Microsoft.AspNetCore.Authorization;
@@ -58,6 +59,8 @@ namespace LevendMonopoly.Api.Controllers
 
         [HttpPost("{teamId}/chance")]
         [Authorize(Policy = "UserOnly")]
+        [TypeFilter(typeof(PauseFilter))]
+
         public async Task<ActionResult<ChanceCard>> Chance(Guid teamId)
         {
             var chanceCard = _chanceCardService.PullChanceCard();

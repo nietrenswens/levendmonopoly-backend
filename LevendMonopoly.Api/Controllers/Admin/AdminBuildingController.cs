@@ -1,4 +1,5 @@
-﻿using LevendMonopoly.Api.Interfaces.Services;
+﻿using LevendMonopoly.Api.Filters;
+using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -68,6 +69,8 @@ namespace LevendMonopoly.Api.Controllers.Admin
         }
 
         [HttpPost("confiscate")]
+        [TypeFilter(typeof(PauseFilter))]
+
         public async Task<ActionResult> Confiscate(ConfiscateCommand command)
         {
             var existingBuilding = await _buildingService.GetBuildingAsync(command.Id);

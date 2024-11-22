@@ -6,5 +6,6 @@ namespace LevendMonopoly.Api.Models
     {
         public int Id { get; set; }
         public decimal TaxRate { get; set; }
+        public bool Paused { get; set; }
     }
 }
