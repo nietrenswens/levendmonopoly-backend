@@ -88,8 +88,20 @@ namespace LevendMonopoly.Api.Services
                 if (buildings == null)
                     return Result.Failure("Het opgegeven bestand kan niet geladen worden");
 
-                _context.Buildings.UpdateRange(buildings);
+                var result = _context.Buildings.ToList();
 
+                foreach (var building in buildings)
+                {
+                    if (result.Any(b => b.Id == building.Id))
+                    {
+                        _context.Update(building);
+                    }
+                    else
+                    {
+                        _context.Add(building);
+                    }
+
+                }
                 await _context.SaveChangesAsync();
             }
             catch (Exception e)
