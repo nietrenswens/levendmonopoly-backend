@@ -90,12 +90,12 @@ namespace LevendMonopoly.Api.Controllers
         }
 
         [HttpPost("startcode")]
-        public ActionResult PullChanceCard(StartcodePullCommand command)
+        public async Task<ActionResult> PullChanceCard(StartcodePullCommand command)
         {
             var teamId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
             if (teamId == null) return Unauthorized();
             var id = Guid.Parse(teamId);
-            if (!_startcodeService.PullStartcode(id, command.Code))
+            if (!await _startcodeService.PullStartcode(id, command.Code))
                 return BadRequest("De startcode is onjuist.");
             return NoContent();
         }
