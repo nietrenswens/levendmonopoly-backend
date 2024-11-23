@@ -54,5 +54,11 @@ namespace LevendMonopoly.Api.Services
             });
             return true;
         }
+
+        public void Reset()
+        {
+            _context.StartcodePull.Clear();
+            _context.SaveChanges();
+        }
     }
 }

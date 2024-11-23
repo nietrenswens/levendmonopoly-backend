@@ -14,13 +14,15 @@ namespace LevendMonopoly.Api.Controllers.Admin
         private readonly ITeamService _teamService;
         private readonly IChanceCardService _chanceCardService;
         private readonly ITransactionService _transactionService;
+        private readonly IStartcodeService _startcodeService;
 
-        public AdminController(IBuildingService buildingService, ITeamService teamService, IChanceCardService chanceCardService, ITransactionService transactionService)
+        public AdminController(IBuildingService buildingService, ITeamService teamService, IChanceCardService chanceCardService, ITransactionService transactionService, IStartcodeService startcodeService)
         {
             _buildingService = buildingService;
             _teamService = teamService;
             _chanceCardService = chanceCardService;
             _transactionService = transactionService;
+            _startcodeService = startcodeService;
         }
 
         [HttpPost("resetgame")]
@@ -30,6 +32,7 @@ namespace LevendMonopoly.Api.Controllers.Admin
             await _teamService.ResetAllTeams();
             _chanceCardService.ResetPulls();
             _transactionService.ResetTransactions();
+            _startcodeService.Reset();
 
             return NoContent();
         }
