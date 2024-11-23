@@ -17,14 +17,16 @@ namespace LevendMonopoly.Api.Controllers
         private IUserService _userService;
         private IChanceCardService _chanceCardService;
         private ITransactionService _transactionService;
+        private IStartcodeService _startcodeService;
 
-        public TeamController(ITeamService teamService, IBuildingService buildingService, IUserService userService, IChanceCardService chanceCardService, ITransactionService transactionService)
+        public TeamController(ITeamService teamService, IBuildingService buildingService, IUserService userService, IChanceCardService chanceCardService, ITransactionService transactionService, IStartcodeService startcodeService)
         {
             _teamService = teamService;
             _buildingService = buildingService;
             _userService = userService;
             _chanceCardService = chanceCardService;
             _transactionService = transactionService;
+            _startcodeService = startcodeService;
         }
 
         [HttpGet]
@@ -86,6 +88,22 @@ namespace LevendMonopoly.Api.Controllers
 
             return Ok(chanceCard);
         }
+
+        [HttpPost("startcode")]
+        public ActionResult PullChanceCard(StartcodePullCommand command)
+        {
+            var teamId = User.Claims.FirstOrDefault(c => c.Type == "id")?.Value;
+            if (teamId == null) return Unauthorized();
+            var id = Guid.Parse(teamId);
+            if (!_startcodeService.PullStartcode(id, command.Code))
+                return BadRequest("De startcode is onjuist.");
+            return NoContent();
+        }
+    }
+
+    public record StartcodePullCommand
+    {
+        public required string Code { get; init; }
     }
 
     public record CreateTeamCommand

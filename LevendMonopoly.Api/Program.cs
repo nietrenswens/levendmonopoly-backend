@@ -61,6 +61,7 @@ builder.Services.AddTransient<IChanceCardService, ChanceCardService>();
 builder.Services.AddTransient<IRoleService, RoleService>();
 builder.Services.AddTransient<IPDFService, PDFService>();
 builder.Services.AddTransient<ITransactionService, TransactionService>();
+builder.Services.AddTransient<IStartcodeService, StartcodeService>();
 
 //GlobalFontSettings.FontResolver = new RobotoFontResolver();
 
