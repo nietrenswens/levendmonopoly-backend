@@ -1,20 +1,17 @@
 using LevendMonopoly.Api.Data;
 using LevendMonopoly.Api.Interfaces.Services;
 using LevendMonopoly.Api.Models;
-using LevendMonopoly.Api.Records;
-using Microsoft.AspNetCore.Razor.TagHelpers;
-using Microsoft.EntityFrameworkCore;
 
 namespace LevendMonopoly.Api.Services
 {
     public class StartcodeService : IStartcodeService
     {
         private readonly List<string> startCodes = new () {
-            "HOI123",
-            "DOEI456",
-            "START01",
-            "GEEFGELD7",
-            "WINNER9"
+            "START4",
+            "GELD2",
+            "CENTEN6",
+            "MONEY9",
+            "CASH7"
         };
 
         private readonly DataContext _context;

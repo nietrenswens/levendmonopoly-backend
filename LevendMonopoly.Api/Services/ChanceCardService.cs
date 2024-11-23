@@ -19,6 +19,10 @@ namespace LevendMonopoly.Api.Services
             new ChanceCard { Prompt = "Je hebt het thema gewonnen op zomerkamp. Je ontvangt 1200 euro.", Result = 1200 },
             new ChanceCard { Prompt = "Je hebt gescholden (zonder appelkoek). Je verliest 400 euro.", Result = -400 },
             new ChanceCard { Prompt = "Je hebt Sjoerd geholpen met het opknappen van de Colemans. Je ontvangt 400 euro.", Result = 400 },
+            new ChanceCard { Prompt = "Je bent langer dan Linda. Je verliest 200 euro.", Result = -200 },
+            new ChanceCard { Prompt = "Je hebt koffiegezet op zomerkamp. Je krijgt 300 euro.", Result = 300 },
+            new ChanceCard { Prompt = "Je zit met meer dan 2 mensen op de wipwap. Je betaalt 1000 euro compensatie.", Result = -1000 },
+            new ChanceCard { Prompt = "Je kent de wet. Je krijgt 300 euro.", Result = 300 },
             ];
 
         private readonly DataContext _context;
