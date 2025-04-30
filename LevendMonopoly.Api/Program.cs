@@ -51,6 +51,7 @@ builder.Services.AddAuthorization(options =>
     options.AddPolicy("UserOnly", policy => policy.RequireClaim("IsUser"));
 });
 
+builder.Services.AddHealthChecks();
 builder.Services.AddTransient<ITeamService, TeamService>();
 builder.Services.AddTransient<LevendMonopoly.Api.Interfaces.Services.ILogger, Logger>();
 builder.Services.AddTransient<IUserService, UserService>();
@@ -77,6 +78,10 @@ app.Urls.Add("http://*:5000");
 
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    _ = endpoints.MapHealthChecks("/health");
+});
 
 app.UseCors();
 app.MapControllers();
